@@ -1,75 +1,72 @@
 object Form3: TForm3
-  Left = 600
-  Top = 314
-  Width = 915
-  Height = 174
+  Left = 278
+  Height = 115
+  Top = 467
+  Width = 723
   Caption = 'Form3'
+  ClientHeight = 115
+  ClientWidth = 723
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
-  TextHeight = 13
+  LCLVersion = '1.8.0.6'
   object Label1: TLabel
     Left = 8
-    Top = 8
-    Width = 158
     Height = 13
-    Caption = 'Entrez ou collez une cha'#238'ne EPD'
+    Top = 8
+    Width = 88
+    Caption = 'Enter or copy EPD'
+    ParentColor = False
   end
   object Edit1: TEdit
-    Left = 0
+    Left = 2
+    Height = 24
     Top = 24
     Width = 713
-    Height = 28
-    Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -15
     Font.Name = 'MS Sans Serif'
-    Font.Style = []
     ParentFont = False
     TabOrder = 0
   end
   object BitBtn1: TBitBtn
     Left = 616
+    Height = 33
     Top = 64
     Width = 97
-    Height = 33
-    Caption = 'Retour'
-    Font.Charset = DEFAULT_CHARSET
+    Caption = 'Back'
     Font.Color = clWindowText
     Font.Height = -15
     Font.Name = 'MS Sans Serif'
-    Font.Style = []
+    OnClick = BitBtn1Click
     ParentFont = False
     TabOrder = 1
-    OnClick = BitBtn1Click
   end
   object Panel1: TPanel
-    Left = 0
+    Left = 2
+    Height = 49
     Top = 56
     Width = 129
-    Height = 49
+    ClientHeight = 49
+    ClientWidth = 129
     TabOrder = 2
     object RadioButton1: TRadioButton
       Left = 8
+      Height = 19
       Top = 8
-      Width = 113
-      Height = 17
-      Caption = 'trait '#224' l'#39'ordinateur'
+      Width = 100
+      Caption = 'trait а l''ordinateur'
       Checked = True
       TabOrder = 0
       TabStop = True
     end
     object RadioButton2: TRadioButton
       Left = 8
+      Height = 19
       Top = 24
-      Width = 113
-      Height = 17
-      Caption = 'trait '#224' l'#39'humain'
+      Width = 87
+      Caption = 'trait а l''humain'
       TabOrder = 1
     end
   end

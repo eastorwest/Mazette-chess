@@ -9,8 +9,7 @@ uses
   {$IFnDEF FPC}
   Windows, Messages,
   {$ENDIF}
-  SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls,
+  SysUtils, Classes, Graphics, Controls, Forms, StdCtrls, Buttons, ExtCtrls,
   Variables, Plateau, Fonctions;
 
 type
