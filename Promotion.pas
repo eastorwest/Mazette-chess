@@ -1,7 +1,7 @@
 // Auteur Montero-Ribas
 // Logiciel sous license GNU GPL
 
-unit EPD;
+unit Promotion;
 
 interface
 
@@ -10,18 +10,16 @@ uses
   Windows, Messages,
   {$ENDIF}
   SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, Buttons, ExtCtrls,
-  Variables, Plateau, Fonctions;
+  Dialogs, StdCtrls;
 
 type
-  TForm3 = class(TForm)
-    Edit1: TEdit;
-    BitBtn1: TBitBtn;
-    Label1: TLabel;
-    Panel1: TPanel;
+  TForm2 = class(TForm)
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
-    procedure BitBtn1Click(Sender: TObject);
+    RadioButton3: TRadioButton;
+    RadioButton4: TRadioButton;
+    Button1: TButton;
+    procedure Button1Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -29,13 +27,13 @@ type
   end;
 
 var
-  Form3: TForm3;
+  Form2: TForm2;
 
 implementation
 
 {$R *.dfm}
 
-procedure TForm3.BitBtn1Click(Sender: TObject);
+procedure TForm2.Button1Click(Sender: TObject);
 begin
   Close;
 end;
