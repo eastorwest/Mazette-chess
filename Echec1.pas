@@ -10,22 +10,25 @@ uses
   Windows, Messages,
   {$ENDIF}
   SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ComCtrls, Menus, Buttons,
-  Variables, Plateau;
+  Dialogs, ExtCtrls, StdCtrls, ComCtrls, Menus, Buttons;
 
 type
+
+  { TForm1 }
+
   TForm1 = class(TForm)
     Image1: TImage;
+    miExit: TMenuItem;
     Panel1: TPanel;
     Label1: TLabel;
     MainMenu1: TMainMenu;
-    Fichier1: TMenuItem;
+    miFile: TMenuItem;
     Nouvellepartieaveclesblancs1: TMenuItem;
     Niveaux1: TMenuItem;
-    Echiquier1: TMenuItem;
+    miBoard: TMenuItem;
     Grand1: TMenuItem;
     rsgrand1: TMenuItem;
-    Apropos1: TMenuItem;
+    miAbout: TMenuItem;
     Label4: TLabel;
     Niveau35: TMenuItem;
     OpenDialog1: TOpenDialog;
@@ -45,7 +48,7 @@ type
     moyen1: TMenuItem;
     Effacerlesflches1: TMenuItem;
     Niveau50: TMenuItem;
-    Stop1: TMenuItem;
+    miStop: TMenuItem;
     Bleu1: TMenuItem;
     Olive1: TMenuItem;
     Label5: TLabel;
@@ -60,10 +63,11 @@ type
     procedure FormResize(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    procedure miExitClick(Sender: TObject);
     procedure Nouvellepartieaveclesblancs1Click(Sender: TObject);
     procedure Grand1Click(Sender: TObject);
     procedure rsgrand1Click(Sender: TObject);
-    procedure Apropos1Click(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
     procedure Niveau35Click(Sender: TObject);
     procedure niveau40Click(Sender: TObject);
     procedure ourner1Click(Sender: TObject);
@@ -79,7 +83,7 @@ type
     procedure refttClick(Sender: TObject);
     procedure moyen1Click(Sender: TObject);
     procedure Effacerlesflches1Click(Sender: TObject);
-    procedure Stop1Click(Sender: TObject);
+    procedure miStopClick(Sender: TObject);
     procedure Bleu1Click(Sender: TObject);
     procedure Olive1Click(Sender: TObject);
     procedure Niveau55Click(Sender: TObject);
@@ -104,8 +108,13 @@ implementation
 {$R *.dfm}
 
 uses
-  Math, IniFiles,
-  Deplacements, Fonctions, AB, Promotion, Recherchedecoups, EPD;
+  Variables, Plateau, Deplacements, Fonctions, AB, Promotion, Recherchedecoups, EPD;
+
+function Min(const a,b: longint): longint;
+begin
+  if a < b then Result := a
+           else Result := b;
+end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
@@ -169,8 +178,8 @@ var
   s: string;
   mouv_str: T_str12;
 begin
-  form1.Stop1.Visible := True;
-  form1.Fichier1.Visible := False;
+  form1.miStop.Visible := True;
+  form1.miFile.Visible := False;
   form1.Outils1.Visible := False;
   form1.Label5.Caption := '';
   historique := '';
@@ -198,8 +207,8 @@ begin
     s := s + '.5';
   s := s + ' coups';
   form1.label4.Caption := s;
-  form1.Fichier1.Enabled := False;
-  h := GetTickCount;
+  form1.miFile.Enabled := False;
+  h := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
   Nb_Eval := 0;
   b := suivant(historique, best_depart, best_arrivee);
   if b then
@@ -243,12 +252,12 @@ begin
     generer_liste_coup(coups_possibles, not couleur_ordi);
     possibles := Coups_Possibles;
     if possibles.Nb_pos = 0 then
-      ShowMessage('Mat');
+      ShowMessage('CheckMate');
   end;
   enabler(True, True, False, False);
-  form1.Fichier1.Enabled := True;
-  form1.Stop1.Visible := False;
-  form1.Fichier1.Visible := True;
+  form1.miFile.Enabled := True;
+  form1.miStop.Visible := False;
+  form1.miFile.Visible := True;
   form1.Outils1.Visible := True;
 end;
 
@@ -264,7 +273,7 @@ begin
   if Couleur_Ordi xor (not Odd(Index_Hist)) xor (EPD_noir_dabord and
     EPD_encours){ XOR EPD_swap } then
   begin
-    ShowMessage('Ce n''est pas votre tour de jouer !');
+    ShowMessage('It is not your turn to play move !');
     exit;
   end;
   if button = mbLeft then
@@ -357,6 +366,11 @@ begin
   enabler(True, True, False, False);
 end;
 
+procedure TForm1.miExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure retire_checked;
 begin
   Form1.Niveau35.Checked := False;
@@ -447,7 +461,7 @@ begin
   dessine(posit_dessin);
 end;
 
-procedure TForm1.Apropos1Click(Sender: TObject);
+procedure TForm1.miAboutClick(Sender: TObject);
 begin
   AboutBox.showmodal;
 end;
@@ -494,7 +508,7 @@ begin
   begin
     nomdefichier := SaveDialog1.Filename;
     if FileExists(nomdefichier) then
-      if MessageDlg('Le fichier existe déja, voulez-vous le remplacer ?',
+      if MessageDlg('File already exists. Do you wish to replace it ?',
         mtConfirmation, [mbYes, mbNo], 0) = mrNo then
         exit;
     assignfile(F, nomdefichier);
@@ -657,7 +671,7 @@ begin
   Effacerlesflches1.Checked := not (Effacerlesflches1.Checked);
 end;
 
-procedure TForm1.Stop1Click(Sender: TObject);
+procedure TForm1.miStopClick(Sender: TObject);
 begin
   stop := True;
 end;
@@ -757,7 +771,6 @@ var
   end;
 
 begin
-
   total := 0;
   if color then
     Cases_battues_par_noirs
@@ -784,7 +797,7 @@ begin
             largeur div 3, ouy - largeur div 3);
         end;
     end;
-  ShowMessage(strint(total) + '  cases contrôlées.');
+  ShowMessage(strint(total) + '  control squares.');
   Dessine(posit);
 end;
 

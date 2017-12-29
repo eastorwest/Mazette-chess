@@ -127,92 +127,96 @@ object Form1: TForm1
   object MainMenu1: TMainMenu
     left = 344
     top = 200
-    object Fichier1: TMenuItem
-      Caption = 'Fichier'
+    object miFile: TMenuItem
+      Caption = 'File'
       Hint = 'Nouvelle partie'
       object Nouvellepartieaveclesblancs1: TMenuItem
-        Caption = 'Nouvelle partie avec les blancs'
+        Caption = 'New game White'
         OnClick = Nouvellepartieaveclesblancs1Click
       end
       object Nouvellepartieaveclesnoirs1: TMenuItem
-        Caption = 'Nouvelle partie avec les noirs'
+        Caption = 'New game Black'
         OnClick = Nouvellepartieaveclesnoirs1Click
       end
       object Sauverlapartie1: TMenuItem
-        Caption = 'Enregistrer sous...'
+        Caption = 'Save game...'
         OnClick = Sauverlapartie1Click
       end
       object Chargerunepartie1: TMenuItem
-        Caption = 'Ouvrir...'
+        Caption = 'Open game...'
         OnClick = Chargerunepartie1Click
       end
       object LireEPD1: TMenuItem
-        Caption = 'Lire EPD'
+        Caption = 'Read EPD'
         OnClick = LireEPD1Click
       end
+      object miExit: TMenuItem
+        Caption = 'Exit'
+        OnClick = miExitClick
+      end
     end
-    object Stop1: TMenuItem
+    object miStop: TMenuItem
       Caption = 'Stop'
       Visible = False
-      OnClick = Stop1Click
+      OnClick = miStopClick
     end
     object Niveaux1: TMenuItem
-      Caption = 'Niveaux'
+      Caption = 'Depth'
       object Niveau35: TMenuItem
-        Caption = '3.5 coups    (t = 1)'
+        Caption = '3.5 ply    (t = 1)'
         OnClick = Niveau35Click
       end
       object niveau40: TMenuItem
-        Caption = '4   coups     (x5)'
+        Caption = '4   ply     (x5)'
         OnClick = niveau40Click
       end
       object niveau45: TMenuItem
-        Caption = '4.5 coups    (x40)'
+        Caption = '4.5 ply    (x40)'
         Checked = True
         OnClick = niveau45Click
       end
       object Niveau50: TMenuItem
-        Caption = '5    coups    (x150)'
+        Caption = '5    ply    (x150)'
         OnClick = Niveau50Click
       end
       object Niveau55: TMenuItem
-        Caption = '5.5 coups (long!)'
+        Caption = '5.5 ply (long!)'
         OnClick = Niveau55Click
       end
       object Niveau60: TMenuItem
-        Caption = '6    coups (trиs long !)'
+        Caption = '6    ply (very long !)'
         OnClick = Niveau60Click
       end
       object Niveau65: TMenuItem
-        Caption = '6.5  coups (trиs trиs long !)'
+        Caption = '6.5  ply (very very long !)'
         OnClick = Niveau65Click
       end
     end
-    object Echiquier1: TMenuItem
-      Caption = 'Echiquier'
+    object miBoard: TMenuItem
+      Caption = 'Board'
       object Grand1: TMenuItem
-        Caption = 'Petit'
+        Caption = 'Small'
         OnClick = Grand1Click
       end
       object moyen1: TMenuItem
-        Caption = 'Moyen'
+        Caption = 'Medium'
         OnClick = moyen1Click
       end
       object rsgrand1: TMenuItem
-        Caption = 'Grand'
+        Caption = 'Large'
         OnClick = rsgrand1Click
       end
       object ourner1: TMenuItem
-        Caption = 'Tourner'
+        Caption = 'Rotate'
         OnClick = ourner1Click
       end
       object Effacerlesflches1: TMenuItem
-        Caption = 'Effacer les flкches'
+        Caption = 'Delete arrows'
         Checked = True
         OnClick = Effacerlesflches1Click
       end
       object Bleu1: TMenuItem
-        Caption = 'Bleu'
+        Caption = 'Blue'
         OnClick = Bleu1Click
       end
       object Olive1: TMenuItem
@@ -221,19 +225,19 @@ object Form1: TForm1
       end
     end
     object Outils1: TMenuItem
-      Caption = 'Outils'
+      Caption = 'Tools'
       object Casesbattuesblancs1: TMenuItem
-        Caption = 'Cases contrфlйes par les blancs'
+        Caption = 'Control squares White'
         OnClick = Casesbattuesblancs1Click
       end
       object Casesbattuesnoirs1: TMenuItem
-        Caption = 'Cases contrфlйes par les noirs'
+        Caption = 'Control squares Black'
         OnClick = Casesbattuesnoirs1Click
       end
     end
-    object Apropos1: TMenuItem
-      Caption = 'A propos'
-      OnClick = Apropos1Click
+    object miAbout: TMenuItem
+      Caption = 'About'
+      OnClick = miAboutClick
     end
   end
   object OpenDialog1: TOpenDialog
