@@ -1,0 +1,7 @@
+*.dbg
+*.exe
+*.bak
+*.lps
+
+lib/
+backup/
