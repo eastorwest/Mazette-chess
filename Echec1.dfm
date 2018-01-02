@@ -63,7 +63,7 @@ object Form1: TForm1
       Width = 1
       ParentColor = False
     end
-    object def0: TBitBtn
+    object btnFirstMove: TBitBtn
       Left = 0
       Height = 25
       Top = 0
@@ -74,11 +74,11 @@ object Form1: TForm1
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
-      OnClick = def0Click
+      OnClick = btnFirstMoveClick
       ParentFont = False
       TabOrder = 0
     end
-    object def: TBitBtn
+    object btnPrevMove: TBitBtn
       Left = 32
       Height = 25
       Top = 0
@@ -89,11 +89,11 @@ object Form1: TForm1
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
-      OnClick = defClick
+      OnClick = btnPrevMoveClick
       ParentFont = False
       TabOrder = 1
     end
-    object ref: TBitBtn
+    object btnNextMove: TBitBtn
       Left = 64
       Height = 25
       Top = 0
@@ -104,11 +104,11 @@ object Form1: TForm1
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
-      OnClick = refClick
+      OnClick = btnNextMoveClick
       ParentFont = False
       TabOrder = 2
     end
-    object reftt: TBitBtn
+    object btnLastMove: TBitBtn
       Left = 96
       Height = 25
       Top = 0
@@ -119,7 +119,7 @@ object Form1: TForm1
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = [fsBold]
-      OnClick = refttClick
+      OnClick = btnLastMoveClick
       ParentFont = False
       TabOrder = 3
     end
@@ -138,13 +138,17 @@ object Form1: TForm1
         Caption = 'New game Black'
         OnClick = Nouvellepartieaveclesnoirs1Click
       end
-      object Sauverlapartie1: TMenuItem
+      object miSaveGame: TMenuItem
         Caption = 'Save game...'
-        OnClick = Sauverlapartie1Click
+        OnClick = miSaveGameClick
       end
-      object Chargerunepartie1: TMenuItem
+      object miOpenGame: TMenuItem
         Caption = 'Open game...'
-        OnClick = Chargerunepartie1Click
+        OnClick = miOpenGameClick
+      end
+      object miExportGame: TMenuItem
+        Caption = 'Export game'
+        OnClick = miExportGameClick
       end
       object LireEPD1: TMenuItem
         Caption = 'Read EPD'
@@ -243,8 +247,8 @@ object Form1: TForm1
   object OpenDialog1: TOpenDialog
     DefaultExt = '.*.txt'
     Filter = 'Txte|*.txt'
-    left = 240
-    top = 224
+    left = 144
+    top = 216
   end
   object OpenDialog2: TOpenDialog
     DefaultExt = '.*.zet'
@@ -254,8 +258,8 @@ object Form1: TForm1
   end
   object SaveDialog1: TSaveDialog
     DefaultExt = '.*.zet'
-    Filter = 'Fichier Mazette|*.zet'
-    left = 184
+    Filter = 'Fichier Mazette (*.zet)|*.zet'
+    left = 224
     top = 112
   end
   object Timer1: TTimer
@@ -264,5 +268,11 @@ object Form1: TForm1
     OnTimer = Timer1Timer
     left = 592
     top = 208
+  end
+  object SaveDialog2: TSaveDialog
+    DefaultExt = '.*.txt'
+    Filter = 'ASCII text (*.txt)|*.txt'
+    left = 224
+    top = 288
   end
 end

@@ -8,7 +8,7 @@ interface
 uses Graphics, Variables;
 
 function mouv(de, ar: integer): T_str12;
-procedure enabler(def0b, defb, refb, refttb: boolean);
+procedure enabler(const def0b, defb, refb, refttb: boolean);
 function cartesien(ca: integer): T_str2;
 function enchiffre(const s: T_str2): integer;
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
@@ -39,19 +39,19 @@ begin
     quoi := '';
     lien := '';
     if abs(Cases[de]) = Roi then
-      Quoi := 'R'
+      Quoi := 'K' // King
     else
     if abs(Cases[de]) = Reine then
-      Quoi := 'D'
+      Quoi := 'Q' // Queen
     else
     if abs(Cases[de]) = Tour then
-      Quoi := 'T'
+      Quoi := 'R' // Rook
     else
     if abs(Cases[de]) = Fou then
-      Quoi := 'F'
+      Quoi := 'B' // Bishop
     else
     if abs(Cases[de]) = Cavalier then
-      Quoi := 'C'
+      Quoi := 'N' // Knight
     else
       Quoi := '';
     if sign(Cases[de]) = -sign(Cases[ar]) then
@@ -62,14 +62,14 @@ begin
   end;
 end;
 
-procedure enabler(def0b, defb, refb, refttb: boolean);
+procedure enabler(const def0b, defb, refb, refttb: boolean);
 begin
   with form1 do
   begin
-    def0.Enabled := def0b;
-    def.Enabled := defb;
-    ref.Enabled := refb;
-    reftt.Enabled := refttb;
+    btnFirstMove.Enabled := def0b;
+    btnPrevMove.Enabled := defb;
+    btnNextMove.Enabled := refb;
+    btnLastMove.Enabled := refttb;
   end;
 end;
 
@@ -100,8 +100,8 @@ procedure delay;
 var
   hh: integer;
 begin
-  hh := GetTickCount;
-  while GetTickCount - hh < 5 do ;
+  hh := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
+  while {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF} - hh < 5 do ;
 end;
 
 function dedans(const s, laboite: string): boolean;
@@ -508,7 +508,7 @@ begin
     end;
     EpdToEchiquier := True;
     posit := lechiquier;
-    dessine(posit);
+    PaintBoard(posit);
   end;
 end;
 

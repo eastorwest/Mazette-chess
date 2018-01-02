@@ -9,7 +9,7 @@ uses Variables;
 
 procedure detourne(var li, co, la: integer);
 procedure tourne(var li, co: integer);
-procedure dessine(const p: T_echiquier);
+procedure PaintBoard(const p: T_echiquier);
 
 implementation
 
@@ -69,7 +69,7 @@ begin
   la := li * 8 + co;
 end;
 
-procedure dessine(const p: T_echiquier);
+procedure PaintBoard(const p: T_echiquier);
 var
   li, co, choix, la, oux, ouy: integer;
   polygone: array[1..16] of tpoint;

@@ -18,6 +18,7 @@ type
 
   TForm1 = class(TForm)
     Image1: TImage;
+    miExportGame: TMenuItem;
     miExit: TMenuItem;
     Panel1: TPanel;
     Label1: TLabel;
@@ -35,16 +36,16 @@ type
     niveau40: TMenuItem;
     ourner1: TMenuItem;
     Nouvellepartieaveclesnoirs1: TMenuItem;
-    Sauverlapartie1: TMenuItem;
-    Chargerunepartie1: TMenuItem;
+    miSaveGame: TMenuItem;
+    miOpenGame: TMenuItem;
     OpenDialog2: TOpenDialog;
     SaveDialog1: TSaveDialog;
     niveau45: TMenuItem;
     LireEPD1: TMenuItem;
-    def0: TBitBtn;
-    def: TBitBtn;
-    ref: TBitBtn;
-    reftt: TBitBtn;
+    btnFirstMove: TBitBtn;
+    btnPrevMove: TBitBtn;
+    btnNextMove: TBitBtn;
+    btnLastMove: TBitBtn;
     moyen1: TMenuItem;
     Effacerlesflches1: TMenuItem;
     Niveau50: TMenuItem;
@@ -55,6 +56,7 @@ type
     Niveau55: TMenuItem;
     Niveau60: TMenuItem;
     Niveau65: TMenuItem;
+    SaveDialog2: TSaveDialog;
     Timer1: TTimer;
     Outils1: TMenuItem;
     Casesbattuesblancs1: TMenuItem;
@@ -64,6 +66,7 @@ type
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
     procedure miExitClick(Sender: TObject);
+    procedure miExportGameClick(Sender: TObject);
     procedure Nouvellepartieaveclesblancs1Click(Sender: TObject);
     procedure Grand1Click(Sender: TObject);
     procedure rsgrand1Click(Sender: TObject);
@@ -72,15 +75,15 @@ type
     procedure niveau40Click(Sender: TObject);
     procedure ourner1Click(Sender: TObject);
     procedure Nouvellepartieaveclesnoirs1Click(Sender: TObject);
-    procedure Sauverlapartie1Click(Sender: TObject);
-    procedure Chargerunepartie1Click(Sender: TObject);
+    procedure miSaveGameClick(Sender: TObject);
+    procedure miOpenGameClick(Sender: TObject);
     procedure niveau45Click(Sender: TObject);
     procedure Niveau50Click(Sender: TObject);
     procedure LireEPD1Click(Sender: TObject);
-    procedure defClick(Sender: TObject);
-    procedure refClick(Sender: TObject);
-    procedure def0Click(Sender: TObject);
-    procedure refttClick(Sender: TObject);
+    procedure btnPrevMoveClick(Sender: TObject);
+    procedure btnNextMoveClick(Sender: TObject);
+    procedure btnFirstMoveClick(Sender: TObject);
+    procedure btnLastMoveClick(Sender: TObject);
     procedure moyen1Click(Sender: TObject);
     procedure Effacerlesflches1Click(Sender: TObject);
     procedure miStopClick(Sender: TObject);
@@ -127,9 +130,9 @@ begin
   top := 10;
   initialisation(posit);
   largeur := 95;
-  dessine(posit);
+  PaintBoard(posit);
   largeur := 80;
-  dessine(posit);
+  PaintBoard(posit);
   init_prof := 9;
   Partie_en_cours := False;
   Form1.Label1.Caption := '';
@@ -139,7 +142,7 @@ end;
 
 procedure TForm1.FormResize(Sender: TObject);
 begin
-  dessine(posit_dessin);
+  PaintBoard(posit_dessin);
 end;
 
 function danslaliste(ca: integer; var ef: integer): boolean;
@@ -236,10 +239,10 @@ begin
   if partie_en_cours then
   begin
     mouv_str := mouv(best_depart, best_arrivee);
-    jouer(best_depart, best_arrivee, best_efface);
+    PlayMove(best_depart, best_arrivee, best_efface);
     Empile_Rep;
     inc_historique(best_depart, best_arrivee, best_efface);
-    dessine(posit);
+    PaintBoard(posit);
     posit_dessin := posit;
     Marque_Une_Case(best_arrivee div 8, best_arrivee mod 8, Clblue);
     Marque_Une_Case(best_depart div 8, best_depart mod 8, Clblue);
@@ -313,7 +316,7 @@ begin
             if couleur_Ordi then
             begin
               promo := ((labas <= 7) and (Cases[la] = pion));
-              jouer(la, labas, la_ef);
+              PlayMove(la, labas, la_ef);
               if promo then {promotion pour les blancs}
               begin
                 showmodal;
@@ -334,7 +337,7 @@ begin
             else
             begin
               promo := ((labas >= 56) and (Cases[la] = pionNoir));
-              jouer(la, labas, la_ef);
+              PlayMove(la, labas, la_ef);
               if promo then {promotion pour les noirs}
               begin
                 showmodal;
@@ -354,13 +357,13 @@ begin
             end;
         inc_historique(la, labas, la_ef);
         Empile_Rep;
-        dessine(posit);
+        PaintBoard(posit);
         Marque_Une_Case(la div 8, la mod 8, Clred);
         Marque_Une_Case(labas div 8, labas mod 8, Clred);
         Ordinateur;
       end
       else
-        dessine(posit);
+        PaintBoard(posit);
     end;
   end;
   enabler(True, True, False, False);
@@ -369,6 +372,51 @@ end;
 procedure TForm1.miExitClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TForm1.miExportGameClick(Sender: TObject);
+var
+  F: TextFile;
+  i: Integer;
+  AMoveSList: TStringList;
+begin
+  if SaveDialog2.Execute then
+  begin
+    nomdefichier := SaveDialog2.Filename;
+    if FileExists(nomdefichier) then
+      if MessageDlg('File already exists. Do you wish to replace it ?',
+        mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        exit;
+
+    Coups_en_cours := False;
+    if not EPD_encours then
+      initialisation(posit)
+    else
+      posit := Lechiquier;
+
+    AMoveSList := TStringList.Create;
+    for i := 1 to Combien_hist do // max plies
+    begin
+      AMoveSList.Add(mouv(hist_int[i].depart, hist_int[i].arrivee));
+
+      PlayMove(hist_int[i].depart, hist_int[i].arrivee, hist_int[i].efface);
+      posit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
+    end;
+    posit := posit_dessin; //repair main board from painted board
+
+    AssignFile(F, nomdefichier);
+    ReWrite(F);
+    try
+      for i:=0 to AMoveSList.Count-1 do
+        if i mod 2 = 0 then
+          Write(F, IntToStr(i div 2 + 1)+'. '+AMoveSList[i]+' ')
+        else
+          WriteLn(F, AMoveSList[i]);
+    finally
+      CloseFile(F);
+    end;
+    AMoveSList.Free;
+  end;
 end;
 
 procedure retire_checked;
@@ -392,7 +440,7 @@ begin
   Index_hist := 0;
   Nb_Tour := 0;
   initialisation(posit);
-  dessine(posit);
+  PaintBoard(posit);
   Partie_en_cours := True;
 end;
 
@@ -436,8 +484,8 @@ begin
       labas := enchiffre('b4');
     end;
   end;
-  jouer(la, labas, la);
-  dessine(posit);
+  PlayMove(la, labas, la);
+  PaintBoard(posit);
   inc_historique(la, labas, la);
   Partie_en_cours := True;
 end;
@@ -452,13 +500,13 @@ end;
 procedure TForm1.Grand1Click(Sender: TObject);
 begin
   largeur := 60;
-  dessine(posit_dessin);
+  PaintBoard(posit_dessin);
 end;
 
 procedure TForm1.rsgrand1Click(Sender: TObject);
 begin
   largeur := 95;
-  dessine(posit_dessin);
+  PaintBoard(posit_dessin);
 end;
 
 procedure TForm1.miAboutClick(Sender: TObject);
@@ -473,20 +521,6 @@ begin
   Niveau35.Checked := True;
 end;
 
-procedure restitue(jusque: integer);
-var
-  i: integer;
-begin
-  for i := 1 to jusque do
-  begin
-    empile_Rep;
-    jouer(hist_int[i].depart, hist_int[i].arrivee, hist_int[i].efface);
-    posit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
-  end;
-  dessine(posit);
-  posit_dessin := posit;
-end;
-
 procedure TForm1.niveau40Click(Sender: TObject);
 begin
   Init_Prof := 8;
@@ -497,10 +531,10 @@ end;
 procedure TForm1.ourner1Click(Sender: TObject);
 begin
   Nb_Tour := (Nb_Tour + 1) mod 4;
-  dessine(posit_dessin);
+  PaintBoard(posit_dessin);
 end;
 
-procedure TForm1.Sauverlapartie1Click(Sender: TObject);
+procedure TForm1.miSaveGameClick(Sender: TObject);
 var
   F: file;
 begin
@@ -524,7 +558,21 @@ begin
   end;
 end;
 
-procedure TForm1.Chargerunepartie1Click(Sender: TObject);
+procedure restitue(const jusque: integer);
+var
+  i: integer;
+begin
+  for i := 1 to jusque do
+  begin
+    empile_Rep;
+    PlayMove(hist_int[i].depart, hist_int[i].arrivee, hist_int[i].efface);
+    posit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
+  end;
+  PaintBoard(posit);
+  posit_dessin := posit;
+end;
+
+procedure TForm1.miOpenGameClick(Sender: TObject);
 var
   f: file;
 begin
@@ -534,7 +582,7 @@ begin
     Index_hist := 0;
     initialisation(posit);
     Partie_en_cours := True;
-    ASSIGNfile(F, nomdefichier);
+    AssignFile(F, nomdefichier);
     ReSet(f, 1);
     try
       BlockRead(f, Couleur_Ordi, SizeOf(Couleur_Ordi));
@@ -549,7 +597,7 @@ begin
     else
       Nb_Tour := 2;
     restitue(Index_hist);
-    dessine(posit);
+    PaintBoard(posit);
     posit_dessin := posit;
     enabler(True, True, (Index_hist < Combien_hist), (Index_hist < Combien_hist));
   end;
@@ -587,7 +635,7 @@ begin
       end
       else
         Nb_Tour := 2;
-      dessine(posit);
+      PaintBoard(posit);
       if not form3.RadioButton1.Checked then
       begin
         EPD_swap := True;
@@ -600,7 +648,7 @@ begin
     end;
 end;
 
-procedure TForm1.defClick(Sender: TObject);
+procedure TForm1.btnPrevMoveClick(Sender: TObject);
 begin
   if Index_hist < 1 then
     exit;
@@ -615,7 +663,7 @@ begin
   posit_dessin := posit;
 end;
 
-procedure TForm1.refClick(Sender: TObject);
+procedure TForm1.btnNextMoveClick(Sender: TObject);
 begin
   if Index_hist > Combien_hist - 1 then
     exit;
@@ -630,7 +678,7 @@ begin
   posit_dessin := posit;
 end;
 
-procedure TForm1.def0Click(Sender: TObject);
+procedure TForm1.btnFirstMoveClick(Sender: TObject);
 begin
   if Index_hist < 1 then
     exit;
@@ -645,7 +693,7 @@ begin
   posit_dessin := posit;
 end;
 
-procedure TForm1.refttClick(Sender: TObject);
+procedure TForm1.btnLastMoveClick(Sender: TObject);
 begin
   if Index_hist > Combien_hist - 1 then
     exit;
@@ -663,7 +711,7 @@ end;
 procedure TForm1.moyen1Click(Sender: TObject);
 begin
   largeur := 80;
-  dessine(posit_dessin);
+  PaintBoard(posit_dessin);
 end;
 
 procedure TForm1.Effacerlesflches1Click(Sender: TObject);
@@ -798,7 +846,7 @@ begin
         end;
     end;
   ShowMessage(strint(total) + '  control squares.');
-  Dessine(posit);
+  PaintBoard(posit);
 end;
 
 procedure TForm1.Casesbattuesblancs1Click(Sender: TObject);

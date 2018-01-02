@@ -9,19 +9,19 @@ uses IniFiles, Math, Graphics, Classes;
 
 const
   Infini = 30000;
-  Vide = 0;
-  Roi = 1;
-  Reine = 2;
-  Fou = 3;
-  Cavalier = 4;
-  Tour = 5;
-  Pion = 6;
-  RoiNoir = -1;
-  ReineNoir = -2;
-  FouNoir = -3;
-  CavalierNoir = -4;
-  TourNoir = -5;
-  PionNoir = -6;
+  Vide = 0;           // Empty
+  Roi = 1;            // White King
+  Reine = 2;          // White Queen
+  Fou = 3;            // White Bishop
+  Cavalier = 4;       // White Knight
+  Tour = 5;           // White Rook
+  Pion = 6;           // White Pawn
+  RoiNoir = -1;       // Black King
+  ReineNoir = -2;     // Black Queen
+  FouNoir = -3;       // Black Bishop
+  CavalierNoir = -4;  // Black Knight
+  TourNoir = -5;      // Black Rook
+  PionNoir = -6;      // Black Pawn
   Taille_Pile_Rep = 9;
   Noir = True;
   blanc = False;
@@ -54,18 +54,10 @@ type
     position: array[0..127] of T_Element;
     Nb_pos: integer;
   end;
-  T_str100 = string
-
-    [100];
-  T_str12 = string
-
-    [12];
-  T_str2 = string
-
-    [2];
-  T_Str4 = string
-
-    [4];
+  T_str100 = string[100];
+  T_str12 = string[12];
+  T_str2 = string[2];
+  T_Str4 = string[4];
   T_cases_battues = array[0..63] of byte;
 
 var

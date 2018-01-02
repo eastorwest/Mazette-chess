@@ -12,7 +12,7 @@ procedure coups_noirs(var coups: T_Liste_Coup; const La_position: integer);
 procedure coups_blancs(var coups: T_Liste_Coup; const La_position: integer);
 function Cases_battues_par_blancs: integer;
 function Cases_battues_par_noirs: integer;
-procedure jouer(const Le_depart, Larrivee, Lefface: integer);
+procedure PlayMove(const Le_depart, Larrivee, Lefface: integer);
 procedure jouertrue(const Le_depart, Larrivee, Lefface: integer);
 procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer);
 procedure generer_liste_coup(var coups: T_Liste_Coup; const color: boolean);
@@ -705,13 +705,13 @@ begin
   Cases_battues_par_noirs := retour;
 end;
 
-procedure jouer(const Le_depart, Larrivee, Lefface: integer);
+procedure PlayMove(const Le_depart, Larrivee, Lefface: integer);
 var
   prise: shortint;
 begin
   with posit do
   begin
-    prise := cases[Larrivee];
+    prise := Cases[Larrivee];
     case prise of
       pionnoir:
       begin
@@ -785,13 +785,13 @@ begin
           dernier := Larrivee;
       end;
       TourNoir: case Le_depart of
-          0:
+          0: // a8
           begin
             if noir_grand_roque then
               Inc(total, 10);
             noir_grand_roque := False;
           end;
-          7:
+          7: // h8
           begin
             if noir_petit_roque then
               Inc(total, 15);
@@ -799,13 +799,13 @@ begin
           end;
         end;
       Tour: case Le_depart of
-          56:
+          56: // a1
           begin
             if blanc_grand_roque then
               Dec(total, 10);
             blanc_grand_roque := False;
           end;
-          63:
+          63: // h1
           begin
             if blanc_petit_roque then
               Dec(total, 15);

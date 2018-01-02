@@ -4,9 +4,6 @@
     <Version Value="10"/>
     <PathDelim Value="\"/>
     <General>
-      <Flags>
-        <UseDefaultCompilerOptions Value="True"/>
-      </Flags>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
       <Title Value="MAZETTE"/>
@@ -14,9 +11,6 @@
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
     </General>
-    <VersionInfo>
-      <StringTable ProductVersion=""/>
-    </VersionInfo>
     <BuildModes Count="1">
       <Item1 Name="Default" Default="True"/>
     </BuildModes>
@@ -37,7 +31,6 @@
       <Unit0>
         <Filename Value="Mazette.dpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Mazette"/>
       </Unit0>
       <Unit1>
         <Filename Value="Echec1.pas"/>
@@ -45,7 +38,6 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Echec1"/>
       </Unit1>
       <Unit2>
         <Filename Value="Variables.pas"/>
@@ -72,19 +64,23 @@
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="AB.PAS"/>
+        <Filename Value="AB.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit8>
       <Unit9>
         <Filename Value="Promotion.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form2"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit9>
       <Unit10>
         <Filename Value="EPD.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form3"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit10>
     </Units>
   </ProjectOptions>
@@ -96,7 +92,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
       <SyntaxOptions>

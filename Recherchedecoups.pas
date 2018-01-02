@@ -124,7 +124,7 @@ end;
 procedure Affiche;
 begin
   Form1.Label1.Caption := strint(Nb_Eval) + ' Evaluations en : ' +
-    temps(GetTickCount - h);
+    temps({$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF} - h);
 end;
 
 function AlphaBeta(const profondeur: integer; alpha: integer;
@@ -182,7 +182,7 @@ begin
       for i := 1 to Nb_pos do
       begin
         Application.ProcessMessages;
-        jouer(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
         {if color then evalu:=-feuillefalse(-alpha) else evalu:=-feuilletrue(-alpha);}
         evalu := -AlphaBeta(profondeur - 1, -beta, -alpha, not color);
         Posit := encours;
@@ -248,7 +248,7 @@ begin
         end;
       for i := 1 to Nb_pos do
       begin
-        jouer(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
         if (profondeur = profope - 1) then
           position[i, 4] := -AlphaBeta(2, -beta, -alpha, not color)
         else
@@ -270,7 +270,7 @@ begin
       for i := 1 to Nb_pos do
       begin
         Application.ProcessMessages;
-        jouer(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
         t := -Negascout(profondeur - 1, -b, -a, not color);
         if (t > a) then         {modif là !}
         begin
@@ -327,13 +327,13 @@ begin
     end;
     exit;
   end;
-  h := GetTickCount;
+  h := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
   form1.Timer1.Enabled := True;
   with liste_coup do
   begin
     for i := 1 to Nb_pos do
     begin
-      jouer(position[i, 1], position[i, 2], position[i, 3]);
+      PlayMove(position[i, 1], position[i, 2], position[i, 3]);
       position[i, 4] := -negascout(5, -infini, -alpha, not color);
       for j := 1 to i - 1 do
         if (position[i, 4] > position[j, 4]) then
@@ -346,7 +346,7 @@ begin
         end;
       posit := encours;
     end;
-    dessine(posit_dessin);
+    PaintBoard(posit_dessin);
     if Nb_pos = 1 then
     begin
       best_depart := position[1, 1];
@@ -358,13 +358,13 @@ begin
       begin
         Affiche;
         if form1.Effacerlesflches1.Checked then
-          dessine(posit_dessin);
+          PaintBoard(posit_dessin);
         if i > 1 then
           fleche(best_depart, best_arrivee, clgray);
         fleche(position[i, 1], position[i, 2], clBlue);
         if stop then
           exit;
-        jouer(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
         t := -Negascout(profope - 1, -b, -a, not color);
         if (t > a) and (i > 1) then
           a := -Negascout(profope - 1, -infini, -t, not color);
