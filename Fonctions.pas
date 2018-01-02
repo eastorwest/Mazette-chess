@@ -7,15 +7,15 @@ interface
 
 uses Graphics, Variables;
 
-function mouv(de, ar: integer): T_str12;
+function mouv(const de, ar: integer): T_str12;
 procedure enabler(const def0b, defb, refb, refttb: boolean);
-function cartesien(ca: integer): T_str2;
+function cartesien(const ca: integer): T_str2;
 function enchiffre(const s: T_str2): integer;
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
 function strg5(a: single): string;
 procedure Marque_Une_Case(li, co: integer; c: Tcolor);
 procedure marque_possible;
-function strint(a: int64): string;
+function strint(const a: int64): string;
 procedure Initialisation(var posit: T_echiquier);
 procedure empile_Rep;
 procedure Fleche(dela, alabas: integer; couleur: TColor);
@@ -28,9 +28,9 @@ function temps(z: cardinal): string;
 implementation
 
 uses {$IFnDEF FPC} Windows,  {$ENDIF}
-  Math, Forms, Dialogs, Types, Classes, SysUtils, Echec1, Plateau;
+  Math, Forms, Dialogs, Classes, SysUtils, Echec1, Plateau;
 
-function mouv(de, ar: integer): T_str12;
+function mouv(const de, ar: integer): T_str12;
 var
   Quoi, lien: T_str2;
 begin
@@ -58,7 +58,7 @@ begin
       lien := 'x'
     else
       lien := '-';
-    mouv := quoi + cartesien(de) + lien + cartesien(ar);
+    Result := Quoi + cartesien(de) + lien + cartesien(ar);
   end;
 end;
 
@@ -73,7 +73,7 @@ begin
   end;
 end;
 
-function cartesien(ca: integer): T_str2;
+function cartesien(const ca: integer): T_str2;
 const
   ab: string = 'abcdefgh';
   unde: string = '87654321';
@@ -83,17 +83,17 @@ begin
   s := 'xx';
   s[1] := ab[(ca mod 8) + 1];
   s[2] := unde[(ca div 8) + 1];
-  cartesien := s;
+  Result := s;
 end;
 
 function enchiffre(const s: T_str2): integer;
 begin
   if (length(s) <> 2) or (pos(s[1], 'abcdefgh') = 0) or (pos(s[2], '12345678') = 0) then
   begin
-    enchiffre := -1;
+    Result := -1;
     exit;
   end;
-  enchiffre := (pos(s[2], '87654321') - 1) * 8 + (pos(s[1], 'abcdefgh') - 1);
+  Result := (pos(s[2], '87654321') - 1) * 8 + (pos(s[1], 'abcdefgh') - 1);
 end;
 
 procedure delay;
@@ -106,7 +106,7 @@ end;
 
 function dedans(const s, laboite: string): boolean;
 
-  function cestdedans(dou: integer): boolean;
+  function cestdedans(const dou: integer): boolean;
   var
     i, j, Nbcou, Nbdanscou: integer;
     ilyest: boolean;
@@ -142,15 +142,15 @@ function dedans(const s, laboite: string): boolean;
   end;
 
 begin
-  Dedans := False;
+  Result := False;
   if cestdedans(1) then
     if ((length(s) < 5) or (CestDedans(5))) then
-      dedans := True;
+      Result := True;
 end;
 
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
 var
-  i, ar, de, k: integer;
+  i, ar, de: integer;
   test: string;
 begin
   combien_bib := 0;
@@ -209,11 +209,11 @@ procedure Marque_Une_Case(li, co: integer; c: Tcolor);
 begin
   with form1.image1.canvas do
   begin
-    Tourne(li, co);
-    pen.color := c;
+    tourne(li, co);
+    Pen.color := c;
     Pen.Width := 3;
-    rectangle(co * largeur, li * largeur, (co + 1) * largeur, (li + 1) * largeur);
-    pen.color := clblack;
+    Rectangle(co * largeur, li * largeur, (co + 1) * largeur, (li + 1) * largeur);
+    Pen.color := clblack;
     Pen.Width := 1;
   end;
 end;
@@ -227,7 +227,7 @@ begin
       Coups_Possibles.position[i, 2] mod 8, ClRed);
 end;
 
-function strint(a: int64): string;
+function strint(const a: int64): string;
 var
   s1, s: string;
   i, compteur: integer;

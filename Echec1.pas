@@ -25,40 +25,40 @@ type
     MainMenu1: TMainMenu;
     miFile: TMenuItem;
     Nouvellepartieaveclesblancs1: TMenuItem;
-    Niveaux1: TMenuItem;
+    miDepth: TMenuItem;
     miBoard: TMenuItem;
     Grand1: TMenuItem;
     rsgrand1: TMenuItem;
     miAbout: TMenuItem;
     Label4: TLabel;
-    Niveau35: TMenuItem;
+    miPly7: TMenuItem;
     OpenDialog1: TOpenDialog;
-    niveau40: TMenuItem;
-    ourner1: TMenuItem;
+    miPly8: TMenuItem;
+    miRotate: TMenuItem;
     Nouvellepartieaveclesnoirs1: TMenuItem;
     miSaveGame: TMenuItem;
     miOpenGame: TMenuItem;
     OpenDialog2: TOpenDialog;
     SaveDialog1: TSaveDialog;
-    niveau45: TMenuItem;
-    LireEPD1: TMenuItem;
+    miPly9: TMenuItem;
+    miReadEPD: TMenuItem;
     btnFirstMove: TBitBtn;
     btnPrevMove: TBitBtn;
     btnNextMove: TBitBtn;
     btnLastMove: TBitBtn;
     moyen1: TMenuItem;
     Effacerlesflches1: TMenuItem;
-    Niveau50: TMenuItem;
+    miPly10: TMenuItem;
     miStop: TMenuItem;
     Bleu1: TMenuItem;
     Olive1: TMenuItem;
     Label5: TLabel;
-    Niveau55: TMenuItem;
-    Niveau60: TMenuItem;
-    Niveau65: TMenuItem;
+    miPly11: TMenuItem;
+    miPly12: TMenuItem;
+    miPly13: TMenuItem;
     SaveDialog2: TSaveDialog;
     Timer1: TTimer;
-    Outils1: TMenuItem;
+    miTools: TMenuItem;
     Casesbattuesblancs1: TMenuItem;
     Casesbattuesnoirs1: TMenuItem;
     procedure FormCreate(Sender: TObject);
@@ -71,15 +71,15 @@ type
     procedure Grand1Click(Sender: TObject);
     procedure rsgrand1Click(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
-    procedure Niveau35Click(Sender: TObject);
-    procedure niveau40Click(Sender: TObject);
-    procedure ourner1Click(Sender: TObject);
+    procedure miPly7Click(Sender: TObject);
+    procedure miPly8Click(Sender: TObject);
+    procedure miRotateClick(Sender: TObject);
     procedure Nouvellepartieaveclesnoirs1Click(Sender: TObject);
     procedure miSaveGameClick(Sender: TObject);
     procedure miOpenGameClick(Sender: TObject);
-    procedure niveau45Click(Sender: TObject);
-    procedure Niveau50Click(Sender: TObject);
-    procedure LireEPD1Click(Sender: TObject);
+    procedure miPly9Click(Sender: TObject);
+    procedure miPly10Click(Sender: TObject);
+    procedure miReadEPDClick(Sender: TObject);
     procedure btnPrevMoveClick(Sender: TObject);
     procedure btnNextMoveClick(Sender: TObject);
     procedure btnFirstMoveClick(Sender: TObject);
@@ -89,10 +89,10 @@ type
     procedure miStopClick(Sender: TObject);
     procedure Bleu1Click(Sender: TObject);
     procedure Olive1Click(Sender: TObject);
-    procedure Niveau55Click(Sender: TObject);
+    procedure miPly11Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure Niveau60Click(Sender: TObject);
-    procedure Niveau65Click(Sender: TObject);
+    procedure miPly12Click(Sender: TObject);
+    procedure miPly13Click(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: boolean);
     procedure Casesbattuesblancs1Click(Sender: TObject);
@@ -178,12 +178,12 @@ var
   i: integer;
   possibles: T_Liste_Coup;
   b, trouve: boolean;
-  s: string;
   mouv_str: T_str12;
 begin
   form1.miStop.Visible := True;
+  form1.miFile.Enabled := False;
   form1.miFile.Visible := False;
-  form1.Outils1.Visible := False;
+  form1.miTools.Visible := False;
   form1.Label5.Caption := '';
   historique := '';
   Posit_dessin := posit;
@@ -205,12 +205,7 @@ begin
     8..30: profope := Init_Prof + 1;
     31..100: Profope := Init_Prof;
   end;
-  s := 'Analyse : ' + strint(profope div 2);
-  if odd(profope) then
-    s := s + '.5';
-  s := s + ' coups';
-  form1.label4.Caption := s;
-  form1.miFile.Enabled := False;
+  form1.label4.Caption := Format('Analyse: %d plies',[profope]);
   h := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
   Nb_Eval := 0;
   b := suivant(historique, best_depart, best_arrivee);
@@ -261,7 +256,7 @@ begin
   form1.miFile.Enabled := True;
   form1.miStop.Visible := False;
   form1.miFile.Visible := True;
-  form1.Outils1.Visible := True;
+  form1.miTools.Visible := True;
 end;
 
 procedure TForm1.Image1MouseDown(Sender: TObject; Button: TMouseButton;
@@ -379,18 +374,19 @@ var
   F: TextFile;
   i: Integer;
   AMoveSList: TStringList;
+  ATempPosit: T_Echiquier;
 begin
   if SaveDialog2.Execute then
   begin
     nomdefichier := SaveDialog2.Filename;
     if FileExists(nomdefichier) then
       if MessageDlg('File already exists. Do you wish to replace it ?',
-        mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
         exit;
 
-    Coups_en_cours := False;
+    ATempPosit := posit;
     if not EPD_encours then
-      initialisation(posit)
+      Initialisation(posit)
     else
       posit := Lechiquier;
 
@@ -402,7 +398,8 @@ begin
       PlayMove(hist_int[i].depart, hist_int[i].arrivee, hist_int[i].efface);
       posit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
     end;
-    posit := posit_dessin; //repair main board from painted board
+    posit := ATempPosit; //repair main board
+    recalcule;
 
     AssignFile(F, nomdefichier);
     ReWrite(F);
@@ -421,25 +418,25 @@ end;
 
 procedure retire_checked;
 begin
-  Form1.Niveau35.Checked := False;
-  Form1.niveau40.Checked := False;
-  Form1.niveau45.Checked := False;
-  Form1.Niveau50.Checked := False;
-  form1.Niveau55.Checked := False;
-  form1.Niveau60.Checked := False;
-  form1.Niveau65.Checked := False;
+  Form1.miPly7.Checked := False;
+  Form1.miPly8.Checked := False;
+  Form1.miPly9.Checked := False;
+  Form1.miPly10.Checked := False;
+  form1.miPly11.Checked := False;
+  form1.miPly12.Checked := False;
+  form1.miPly13.Checked := False;
 end;
 
 procedure TForm1.Nouvellepartieaveclesblancs1Click(Sender: TObject);
 begin
   EPD_encours := False;
   Fillchar(La_Pile_Rep, SizeOf(La_Pile_Rep), 0);
-  form1.Label1.Caption := '';
+  Label1.Caption := '';
   Couleur_Ordi := True;
   Combien_hist := 0;
   Index_hist := 0;
   Nb_Tour := 0;
-  initialisation(posit);
+  Initialisation(posit);
   PaintBoard(posit);
   Partie_en_cours := True;
 end;
@@ -450,7 +447,7 @@ var
 begin
   EPD_encours := False;
   Fillchar(La_Pile_Rep, SizeOf(La_Pile_Rep), 0);
-  form1.Label1.Caption := '';
+  Label1.Caption := '';
   Couleur_Ordi := False;
   Combien_hist := 0;
   Index_hist := 0;
@@ -490,11 +487,11 @@ begin
   Partie_en_cours := True;
 end;
 
-procedure TForm1.niveau45Click(Sender: TObject);
+procedure TForm1.miPly9Click(Sender: TObject);
 begin
   Init_Prof := 9;
   retire_checked;
-  niveau45.Checked := True;
+  miPly9.Checked := True;
 end;
 
 procedure TForm1.Grand1Click(Sender: TObject);
@@ -514,23 +511,23 @@ begin
   AboutBox.showmodal;
 end;
 
-procedure TForm1.Niveau35Click(Sender: TObject);
+procedure TForm1.miPly7Click(Sender: TObject);
 begin
   Init_Prof := 7;
   retire_checked;
-  Niveau35.Checked := True;
+  miPly7.Checked := True;
 end;
 
-procedure TForm1.niveau40Click(Sender: TObject);
+procedure TForm1.miPly8Click(Sender: TObject);
 begin
   Init_Prof := 8;
   retire_checked;
-  niveau40.Checked := True;
+  miPly8.Checked := True;
 end;
 
-procedure TForm1.ourner1Click(Sender: TObject);
+procedure TForm1.miRotateClick(Sender: TObject);
 begin
-  Nb_Tour := (Nb_Tour + 1) mod 4;
+  Nb_Tour := (Nb_Tour + 2) mod 4;
   PaintBoard(posit_dessin);
 end;
 
@@ -543,17 +540,17 @@ begin
     nomdefichier := SaveDialog1.Filename;
     if FileExists(nomdefichier) then
       if MessageDlg('File already exists. Do you wish to replace it ?',
-        mtConfirmation, [mbYes, mbNo], 0) = mrNo then
+        mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
         exit;
-    assignfile(F, nomdefichier);
-    ReWrite(f, 1);
+    AssignFile(F, nomdefichier);
+    ReWrite(F, 1);
     try
-      BlockWrite(f, Couleur_Ordi, SizeOf(Couleur_Ordi));
-      BlockWrite(f, Index_hist, SizeOf(Index_hist));
-      BlockWrite(f, Combien_hist, SizeOf(Combien_hist));
-      BlockWrite(f, hist_int[1], Combien_hist * SizeOf(hist_int[1]));
+      BlockWrite(F, Couleur_Ordi, SizeOf(Couleur_Ordi));
+      BlockWrite(F, Index_hist, SizeOf(Index_hist));
+      BlockWrite(F, Combien_hist, SizeOf(Combien_hist));
+      BlockWrite(F, hist_int[1], Combien_hist * SizeOf(hist_int[1]));
     finally
-      Closefile(f);
+      Closefile(F);
     end;
   end;
 end;
@@ -603,15 +600,14 @@ begin
   end;
 end;
 
-
-procedure TForm1.Niveau50Click(Sender: TObject);
+procedure TForm1.miPly10Click(Sender: TObject);
 begin
   Init_Prof := 10;
   retire_checked;
-  Niveau50.Checked := True;
+  miPly10.Checked := True;
 end;
 
-procedure TForm1.LireEPD1Click(Sender: TObject);
+procedure TForm1.miReadEPDClick(Sender: TObject);
 begin
   Form3.showmodal;
   Form3.edit1.SelectAll;
@@ -768,11 +764,11 @@ begin
   Change_Couleur(8421376, ClOlive);
 end;
 
-procedure TForm1.Niveau55Click(Sender: TObject);
+procedure TForm1.miPly11Click(Sender: TObject);
 begin
   Init_Prof := 11;
   retire_checked;
-  Niveau55.Checked := True;
+  miPly11.Checked := True;
 end;
 
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -780,18 +776,18 @@ begin
   champ.Free;
 end;
 
-procedure TForm1.Niveau60Click(Sender: TObject);
+procedure TForm1.miPly12Click(Sender: TObject);
 begin
   Init_Prof := 12;
   retire_checked;
-  Niveau60.Checked := True;
+  miPly12.Checked := True;
 end;
 
-procedure TForm1.Niveau65Click(Sender: TObject);
+procedure TForm1.miPly13Click(Sender: TObject);
 begin
   Init_Prof := 13;
   retire_checked;
-  Niveau65.Checked := True;
+  miPly13.Checked := True;
 end;
 
 procedure TForm1.Timer1Timer(Sender: TObject);

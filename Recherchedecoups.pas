@@ -316,7 +316,7 @@ begin
     if (color and souslefeu(posit.Position_Roi[Noir], -1, False)) or
       (not color and souslefeu(posit.Position_Roi[Blanc], 1, False)) then
     begin
-      ShowMessage('Mat !');
+      ShowMessage('CheckMate !');
       partie_en_cours := False;
     end
     else

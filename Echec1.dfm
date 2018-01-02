@@ -125,8 +125,8 @@ object Form1: TForm1
     end
   end
   object MainMenu1: TMainMenu
-    left = 344
-    top = 200
+    left = 40
+    top = 32
     object miFile: TMenuItem
       Caption = 'File'
       Hint = 'Nouvelle partie'
@@ -150,9 +150,9 @@ object Form1: TForm1
         Caption = 'Export game'
         OnClick = miExportGameClick
       end
-      object LireEPD1: TMenuItem
+      object miReadEPD: TMenuItem
         Caption = 'Read EPD'
-        OnClick = LireEPD1Click
+        OnClick = miReadEPDClick
       end
       object miExit: TMenuItem
         Caption = 'Exit'
@@ -164,36 +164,36 @@ object Form1: TForm1
       Visible = False
       OnClick = miStopClick
     end
-    object Niveaux1: TMenuItem
+    object miDepth: TMenuItem
       Caption = 'Depth'
-      object Niveau35: TMenuItem
-        Caption = '3.5 ply    (t = 1)'
-        OnClick = Niveau35Click
+      object miPly7: TMenuItem
+        Caption = '7 ply   (t = 1)'
+        OnClick = miPly7Click
       end
-      object niveau40: TMenuItem
-        Caption = '4   ply     (x5)'
-        OnClick = niveau40Click
+      object miPly8: TMenuItem
+        Caption = '8 ply   (x5)'
+        OnClick = miPly8Click
       end
-      object niveau45: TMenuItem
-        Caption = '4.5 ply    (x40)'
+      object miPly9: TMenuItem
+        Caption = '9 ply   (x40)'
         Checked = True
-        OnClick = niveau45Click
+        OnClick = miPly9Click
       end
-      object Niveau50: TMenuItem
-        Caption = '5    ply    (x150)'
-        OnClick = Niveau50Click
+      object miPly10: TMenuItem
+        Caption = '10 ply (x150)'
+        OnClick = miPly10Click
       end
-      object Niveau55: TMenuItem
-        Caption = '5.5 ply (long!)'
-        OnClick = Niveau55Click
+      object miPly11: TMenuItem
+        Caption = '11 ply (long!)'
+        OnClick = miPly11Click
       end
-      object Niveau60: TMenuItem
-        Caption = '6    ply (very long !)'
-        OnClick = Niveau60Click
+      object miPly12: TMenuItem
+        Caption = '12 ply (very long!)'
+        OnClick = miPly12Click
       end
-      object Niveau65: TMenuItem
-        Caption = '6.5  ply (very very long !)'
-        OnClick = Niveau65Click
+      object miPly13: TMenuItem
+        Caption = '13 ply (very very long!)'
+        OnClick = miPly13Click
       end
     end
     object miBoard: TMenuItem
@@ -210,9 +210,9 @@ object Form1: TForm1
         Caption = 'Large'
         OnClick = rsgrand1Click
       end
-      object ourner1: TMenuItem
+      object miRotate: TMenuItem
         Caption = 'Rotate'
-        OnClick = ourner1Click
+        OnClick = miRotateClick
       end
       object Effacerlesflches1: TMenuItem
         Caption = 'Delete arrows'
@@ -228,7 +228,7 @@ object Form1: TForm1
         OnClick = Olive1Click
       end
     end
-    object Outils1: TMenuItem
+    object miTools: TMenuItem
       Caption = 'Tools'
       object Casesbattuesblancs1: TMenuItem
         Caption = 'Control squares White'
@@ -266,8 +266,8 @@ object Form1: TForm1
     Enabled = False
     Interval = 10000
     OnTimer = Timer1Timer
-    left = 592
-    top = 208
+    left = 144
+    top = 32
   end
   object SaveDialog2: TSaveDialog
     DefaultExt = '.*.txt'
