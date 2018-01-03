@@ -8,8 +8,8 @@ interface
 uses Graphics, Math, Dialogs, Variables, Fonctions;
 
 function souslefeu(const po, s: integer; const from_generer: boolean): boolean;
-procedure coups_noirs(var coups: T_Liste_Coup; const La_position: integer);
-procedure coups_blancs(var coups: T_Liste_Coup; const La_position: integer);
+procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer);
+procedure Moves_white(var coups: T_Liste_Coup; const La_position: integer);
 function Cases_battues_par_blancs: integer;
 function Cases_battues_par_noirs: integer;
 procedure PlayMove(const Le_depart, Larrivee, Lefface: integer);
@@ -291,7 +291,7 @@ begin
   Souslefeu := False;
 end;
 
-procedure coups_noirs(var coups: T_Liste_Coup; const La_position: integer);
+procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer);
 var
   i, li, co: integer;
   Sauv_posit: T_echiquier;
@@ -417,7 +417,7 @@ begin
   end;
 end;
 
-procedure coups_blancs(var coups: T_Liste_Coup; const la_position: integer);
+procedure Moves_white(var coups: T_Liste_Coup; const la_position: integer);
 var
   i, li, co: integer;
   Sauv_posit: T_echiquier;
@@ -1110,14 +1110,14 @@ begin
         Cases_battues_par_blancs;
         for La_Position := 63 downto 0 do
           if cases[La_Position] < 0 then
-            coups_Noirs(coups, La_Position);
+            Moves_black(coups, La_Position);
       end;
       False:
       begin
         Cases_battues_par_noirs;
         for La_Position := 0 to 63 do
           if cases[La_Position] > 0 then
-            coups_blancs(coups, La_Position);
+            Moves_white(coups, La_Position);
       end;
     end;
 end;

@@ -33,7 +33,7 @@ begin
         if cases[j] < 0 then
         begin
           Nb_Pos := 0;
-          coups_Noirs(coups_possibles, j);
+          Moves_black(coups_possibles, j);
           perte := -valeurs_cases[cases[j]] div 3;
           if Nb_Pos <> 0 then
           begin
@@ -85,7 +85,7 @@ begin
         if cases[j] > 0 then
         begin
           Nb_Pos := 0;
-          coups_blancs(coups_possibles, j);
+          Moves_white(coups_possibles, j);
           perte := valeurs_cases[cases[j]] div 3;
           if Nb_Pos <> 0 then
           begin

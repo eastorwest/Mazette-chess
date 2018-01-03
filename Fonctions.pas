@@ -13,7 +13,7 @@ function cartesien(const ca: integer): T_str2;
 function enchiffre(const s: T_str2): integer;
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
 function strg5(a: single): string;
-procedure Marque_Une_Case(li, co: integer; c: Tcolor);
+procedure Mark_Square(li, co: integer; c: Tcolor);
 procedure marque_possible;
 function strint(const a: int64): string;
 procedure Initialisation(var posit: T_echiquier);
@@ -28,15 +28,16 @@ function temps(z: cardinal): string;
 implementation
 
 uses {$IFnDEF FPC} Windows,  {$ENDIF}
-  Math, Forms, Dialogs, Classes, SysUtils, Echec1, Plateau;
+  Forms, Dialogs, Classes, SysUtils, Echec1, Plateau;
 
 function mouv(const de, ar: integer): T_str12;
 var
   Quoi, lien: T_str2;
 begin
+  Result := '';
   with posit do
   begin
-    quoi := '';
+    Quoi := '';
     lien := '';
     if abs(Cases[de]) = Roi then
       Quoi := 'K' // King
@@ -54,10 +55,23 @@ begin
       Quoi := 'N' // Knight
     else
       Quoi := '';
-    if sign(Cases[de]) = -sign(Cases[ar]) then
+    if Cases[ar] <> Vide then
       lien := 'x'
     else
       lien := '-';
+    // Castling
+    if ((Cases[de] = Roi) and (de = 60) and (ar = 62)) or
+    ((Cases[de] = RoiNoir) and (de = 4) and (ar = 6)) then
+    begin
+      Result := 'O-O';
+      exit;
+    end;
+    if ( (Cases[de] = Roi) and (de = 60) and (ar = 58) ) or
+    ((Cases[de] = RoiNoir) and (de = 4) and (ar = 2)) then
+    begin
+      Result := 'O-O-O';
+      exit;
+    end;
     Result := Quoi + cartesien(de) + lien + cartesien(ar);
   end;
 end;
@@ -205,15 +219,15 @@ begin
   Strg5 := s;
 end;
 
-procedure Marque_Une_Case(li, co: integer; c: Tcolor);
+procedure Mark_Square(li, co: integer; c: Tcolor);
 begin
   with form1.image1.canvas do
   begin
     tourne(li, co);
-    Pen.color := c;
+    Pen.Color := c;
     Pen.Width := 3;
     Rectangle(co * largeur, li * largeur, (co + 1) * largeur, (li + 1) * largeur);
-    Pen.color := clblack;
+    Pen.Color := clblack;
     Pen.Width := 1;
   end;
 end;
@@ -223,7 +237,7 @@ var
   i: integer;
 begin
   for i := 1 to Coups_Possibles.Nb_pos do
-    Marque_Une_Case(Coups_Possibles.position[i, 2] div 8,
+    Mark_Square(Coups_Possibles.position[i, 2] div 8,
       Coups_Possibles.position[i, 2] mod 8, ClRed);
 end;
 

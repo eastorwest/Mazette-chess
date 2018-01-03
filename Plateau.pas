@@ -124,13 +124,13 @@ begin
       ouy := round((li + 0.5) * largeur);
       if p.Cases[la] < 0 then
       begin
-        brush.color := clblack;
-        pen.color := clwhite;
+        brush.color := clBlack;
+        pen.color := clWhite;
       end
       else
       begin
-        brush.color := clwhite;
-        pen.color := clblack;
+        brush.color := clWhite;
+        pen.color := clBlack;
       end;
       choix := p.Cases[la];
       case choix of
@@ -167,9 +167,9 @@ begin
           Pen.Width := 1;
         end;
       end;
-      Brush.style := bsclear;
-      pen.color := clgreen;
-      pen.color := clblack;
+      Brush.style := bsClear;
+      pen.color := clGreen;
+      pen.color := clBlack;
     end;
 end;
 

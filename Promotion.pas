@@ -13,10 +13,10 @@ uses
 
 type
   TForm2 = class(TForm)
-    RadioButton1: TRadioButton;
-    RadioButton2: TRadioButton;
-    RadioButton3: TRadioButton;
-    RadioButton4: TRadioButton;
+    rbQueen: TRadioButton;
+    rbRook: TRadioButton;
+    rbBishop: TRadioButton;
+    rbKnight: TRadioButton;
     Button1: TButton;
     procedure Button1Click(Sender: TObject);
   private
@@ -32,9 +32,21 @@ implementation
 
 {$R *.dfm}
 
+uses Variables;
+
 procedure TForm2.Button1Click(Sender: TObject);
 begin
-  Close;
+  if rbQueen.Checked then
+    ModalResult := Reine
+  else
+  if rbRook.Checked then
+    ModalResult := Tour
+  else
+  if rbBishop.Checked then
+    ModalResult := Fou
+  else
+  if rbKnight.Checked then
+    ModalResult := Cavalier;
 end;
 
 end.

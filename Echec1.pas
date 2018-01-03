@@ -219,9 +219,9 @@ begin
     else
     begin
       if couleur_Ordi then
-        coups_Noirs(coups_possibles, best_depart)
+        Moves_black(Coups_Possibles, best_depart)
       else
-        coups_blancs(coups_possibles, best_depart);
+        Moves_white(Coups_Possibles, best_depart);
       trouve := False;
       for i := 1 to Coups_Possibles.Nb_pos do
         if Coups_Possibles.position[i, 2] = best_arrivee then
@@ -239,15 +239,15 @@ begin
     inc_historique(best_depart, best_arrivee, best_efface);
     PaintBoard(posit);
     posit_dessin := posit;
-    Marque_Une_Case(best_arrivee div 8, best_arrivee mod 8, Clblue);
-    Marque_Une_Case(best_depart div 8, best_depart mod 8, Clblue);
+    Mark_Square(best_arrivee div 8, best_arrivee mod 8, Clblue);
+    Mark_Square(best_depart div 8, best_depart mod 8, Clblue);
     form1.Label4.Caption := mouv_str;
   end;
   if (couleur_ordi and souslefeu(posit.position_roi[False], 1, False)) or
     (not couleur_ordi and souslefeu(posit.position_roi[True], -1, False)) then
   begin
     form1.label1.Caption := 'Echec';
-    generer_liste_coup(coups_possibles, not couleur_ordi);
+    generer_liste_coup(Coups_Possibles, not couleur_ordi);
     possibles := Coups_Possibles;
     if possibles.Nb_pos = 0 then
       ShowMessage('CheckMate');
@@ -266,16 +266,16 @@ var
   promo: boolean;
   li, co: integer;
 begin
-  if not partie_en_cours then
-    exit;
-  if Couleur_Ordi xor (not Odd(Index_Hist)) xor (EPD_noir_dabord and
-    EPD_encours){ XOR EPD_swap } then
+  if Button = mbLeft then
   begin
-    ShowMessage('It is not your turn to play move !');
-    exit;
-  end;
-  if button = mbLeft then
-  begin
+    if not partie_en_cours then
+      exit;
+    if Couleur_Ordi xor (not Odd(Index_Hist)) xor (EPD_noir_dabord and
+      EPD_encours){ XOR EPD_swap } then
+    begin
+      ShowMessage('It is not your turn to play move !');
+      exit;
+    end;
     if not Coups_en_cours then
     begin
       la := x div largeur + 8 * (y div largeur);
@@ -287,12 +287,12 @@ begin
       if couleur_Ordi then
       begin
         Cases_battues_par_noirs;
-        coups_blancs(coups_possibles, la);
+        Moves_white(Coups_Possibles, la);
       end
       else
       begin
         Cases_battues_par_blancs;
-        coups_Noirs(coups_possibles, la);
+        Moves_black(Coups_Possibles, la);
       end;
       marque_possible;
       if Coups_Possibles.Nb_pos <> 0 then
@@ -301,67 +301,33 @@ begin
     else
     begin
       enabler(False, False, False, False);
-      coups_en_cours := False;
+      Coups_en_cours := False;
       labas := x div largeur + 8 * (y div largeur);
       detourne(li, co, labas);
       if danslaliste(labas, la_ef) then
       begin
-        with posit do
-          with form2 do
-            if couleur_Ordi then
-            begin
-              promo := ((labas <= 7) and (Cases[la] = pion));
-              PlayMove(la, labas, la_ef);
-              if promo then {promotion pour les blancs}
-              begin
-                showmodal;
-                if RadioButton1.Checked then
-                  Cases[labas] := Reine
-                else
-                if RadioButton2.Checked then
-                  Cases[labas] := Tour
-                else
-                if RadioButton3.Checked then
-                  Cases[labas] := Fou
-                else
-                if RadioButton4.Checked then
-                  Cases[labas] := Cavalier;
-                recalcule;
-              end;
-            end
-            else
-            begin
-              promo := ((labas >= 56) and (Cases[la] = pionNoir));
-              PlayMove(la, labas, la_ef);
-              if promo then {promotion pour les noirs}
-              begin
-                showmodal;
-                if RadioButton1.Checked then
-                  Cases[labas] := ReineNoir
-                else
-                if RadioButton2.Checked then
-                  Cases[labas] := TourNoir
-                else
-                if RadioButton3.Checked then
-                  Cases[labas] := FouNoir
-                else
-                if RadioButton4.Checked then
-                  Cases[labas] := CavalierNoir;
-                recalcule;
-              end;
-            end;
+        if couleur_Ordi then
+          promo := ((labas <= 7) and (Posit.Cases[la] = pion))
+        else
+          promo := ((labas >= 56) and (Posit.Cases[la] = pionNoir));
+        PlayMove(la, labas, la_ef);
+        if promo then {promotion pawn}
+        begin
+          Posit.Cases[labas] := (1 - 2*ord(not couleur_Ordi))*Form2.ShowModal;
+          recalcule;
+        end;
         inc_historique(la, labas, la_ef);
         Empile_Rep;
         PaintBoard(posit);
-        Marque_Une_Case(la div 8, la mod 8, Clred);
-        Marque_Une_Case(labas div 8, labas mod 8, Clred);
+        Mark_Square(la div 8, la mod 8, ClRed);
+        Mark_Square(labas div 8, labas mod 8, ClRed);
         Ordinateur;
       end
       else
         PaintBoard(posit);
     end;
+    enabler(True, True, False, False);
   end;
-  enabler(True, True, False, False);
 end;
 
 procedure TForm1.miExitClick(Sender: TObject);
@@ -841,7 +807,7 @@ begin
             largeur div 3, ouy - largeur div 3);
         end;
     end;
-  ShowMessage(strint(total) + '  control squares.');
+  ShowMessage(Format('%d control squares.', [total]));
   PaintBoard(posit);
 end;
 
