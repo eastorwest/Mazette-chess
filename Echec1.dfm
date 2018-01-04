@@ -198,18 +198,6 @@ object Form1: TForm1
     end
     object miBoard: TMenuItem
       Caption = 'Board'
-      object Grand1: TMenuItem
-        Caption = 'Small'
-        OnClick = Grand1Click
-      end
-      object moyen1: TMenuItem
-        Caption = 'Medium'
-        OnClick = moyen1Click
-      end
-      object rsgrand1: TMenuItem
-        Caption = 'Large'
-        OnClick = rsgrand1Click
-      end
       object miRotate: TMenuItem
         Caption = 'Rotate'
         OnClick = miRotateClick
@@ -219,13 +207,35 @@ object Form1: TForm1
         Checked = True
         OnClick = Effacerlesflches1Click
       end
-      object Bleu1: TMenuItem
-        Caption = 'Blue'
-        OnClick = Bleu1Click
+      object miBoardColor: TMenuItem
+        Caption = 'Color'
+        object miTeal: TMenuItem
+          Caption = 'Blue'
+          OnClick = miTealClick
+        end
+        object miOlive: TMenuItem
+          Caption = 'Olive'
+          OnClick = miOliveClick
+        end
+        object miBoardCustomColor: TMenuItem
+          Caption = 'Custom color'
+          OnClick = miBoardCustomColorClick
+        end
       end
-      object Olive1: TMenuItem
-        Caption = 'Olive'
-        OnClick = Olive1Click
+      object miBoardSize: TMenuItem
+        Caption = 'Size'
+        object miSmallBoard: TMenuItem
+          Caption = 'Small'
+          OnClick = miSmallBoardClick
+        end
+        object miMediumBoard: TMenuItem
+          Caption = 'Medium'
+          OnClick = miMediumBoardClick
+        end
+        object miLargeBoard: TMenuItem
+          Caption = 'Large'
+          OnClick = miLargeBoardClick
+        end
       end
     end
     object miTools: TMenuItem
@@ -273,6 +283,33 @@ object Form1: TForm1
     DefaultExt = '.*.txt'
     Filter = 'ASCII text (*.txt)|*.txt'
     left = 224
-    top = 288
+    top = 216
+  end
+  object ColorDialog1: TColorDialog
+    Color = clBlack
+    CustomColors.Strings = (
+      'ColorA=000000'
+      'ColorB=000080'
+      'ColorC=008000'
+      'ColorD=008080'
+      'ColorE=800000'
+      'ColorF=800080'
+      'ColorG=808000'
+      'ColorH=808080'
+      'ColorI=C0C0C0'
+      'ColorJ=0000FF'
+      'ColorK=00FF00'
+      'ColorL=00FFFF'
+      'ColorM=FF0000'
+      'ColorN=FF00FF'
+      'ColorO=FFFF00'
+      'ColorP=FFFFFF'
+      'ColorQ=C0DCC0'
+      'ColorR=F0CAA6'
+      'ColorS=F0FBFF'
+      'ColorT=A4A0A0'
+    )
+    left = 312
+    top = 112
   end
 end

@@ -13,7 +13,7 @@ procedure PaintBoard(const p: T_echiquier);
 
 implementation
 
-uses Types, Graphics, Fonctions, Echec1;
+uses Classes, Graphics, Echec1;
 
 type
   profil = array[1..16] of array[1..2] of single;
@@ -72,57 +72,53 @@ end;
 procedure PaintBoard(const p: T_echiquier);
 var
   li, co, choix, la, oux, ouy: integer;
-  polygone: array[1..16] of tpoint;
+  polygone: array[1..16] of TPoint;
 
-  procedure ligne(x1, y1, X2, Y2: single);
+  procedure ligne(const x1, y1, X2, Y2: single);
   begin
-    with form1.image1.canvas do
+    with Form1.image1.Canvas do
     begin
-      MoveTo(round(X1), round(Y1));
-      LineTo(round(X2), round(Y2));
+      MoveTo(Round(X1), Round(Y1));
+      LineTo(Round(X2), Round(Y2));
     end;
   end;
 
-  procedure Trace_Profil(const lax, lay: integer; const qui: Profil; Combien: integer);
+  procedure Trace_Profil(const lax, lay: integer; const qui: Profil; const Combien: integer);
   var
     i: integer;
   begin
     for i := 1 to combien do
     begin
-      polygone[i].x := lax + round(qui[i, 1] * largeur);
-      polygone[i].y := lay + round(qui[i, 2] * largeur);
+      polygone[i].x := lax + Round(qui[i, 1] * largeur);
+      polygone[i].y := lay + Round(qui[i, 2] * largeur);
     end;
-    form1.image1.canvas.polygon(Slice(polygone, Combien));
+    Form1.image1.Canvas.polygon(Slice(polygone, Combien));
   end;
 
 begin
-  Form1.Clientwidth := 8 * largeur;
-  Form1.ClientHeight := 8 * largeur + form1.Panel1.Height;
-  Form1.Image1.Width := 8 * largeur;
-  Form1.Image1.Height := 8 * largeur;
-  with form1.image1.canvas do
+  Form1.ClientWidth := 8 * largeur;
+  Form1.ClientHeight := 8 * largeur + Form1.Panel1.Height;
+  Form1.Image1.Height := 10 * largeur; //strange 10, but works
+  with Form1.image1.Canvas do
     for la := 0 to 63 do
     begin
       li := La div 8;
       co := La mod 8;
       tourne(li, co);
       if odd(Nb_Tour) xor odd(li + co) then
-        brush.color := Couleur_fond
+        Brush.color := Couleur_fond
       else
-        brush.color := Couleur_Blanc;
-      polygone[1].x := co * largeur;
-      polygone[1].y := li * largeur;
-      polygone[2].x := co * largeur;
-      polygone[2].y := (li + 1) * largeur;
-      polygone[3].x := (co + 1) * largeur;
-      polygone[3].y := (li + 1) * largeur;
-      polygone[4].x := (co + 1) * largeur;
-      polygone[4].y := li * largeur;
-      Brush.style := bssolid;
+        Brush.color := Couleur_Blanc;
+      Brush.style := bsSolid;
+      polygone[1] := Point(co * largeur, li * largeur);
+      polygone[2] := Point(co * largeur, (li + 1) * largeur);
+      polygone[3] := Point((co + 1) * largeur, (li + 1) * largeur);
+      polygone[4] := Point((co + 1) * largeur, li * largeur);
       polygon(Slice(polygone, 4));
-      oux := round((co + 0.5) * largeur);
-      ouy := round((li + 0.5) * largeur);
-      if p.Cases[la] < 0 then
+      oux := Round((co + 0.5) * largeur);
+      ouy := Round((li + 0.5) * largeur);
+      choix := p.Cases[la];
+      if choix < 0 then
       begin
         brush.color := clBlack;
         pen.color := clWhite;
@@ -132,7 +128,6 @@ begin
         brush.color := clWhite;
         pen.color := clBlack;
       end;
-      choix := p.Cases[la];
       case choix of
         PionNoir, Pion: Trace_Profil(oux, ouy, lep, 12);
         TourNoir, Tour: Trace_Profil(oux, ouy, lat, 16);

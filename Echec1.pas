@@ -17,7 +17,11 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    ColorDialog1: TColorDialog;
     Image1: TImage;
+    miBoardSize: TMenuItem;
+    miBoardCustomColor: TMenuItem;
+    miBoardColor: TMenuItem;
     miExportGame: TMenuItem;
     miExit: TMenuItem;
     Panel1: TPanel;
@@ -27,8 +31,8 @@ type
     Nouvellepartieaveclesblancs1: TMenuItem;
     miDepth: TMenuItem;
     miBoard: TMenuItem;
-    Grand1: TMenuItem;
-    rsgrand1: TMenuItem;
+    miSmallBoard: TMenuItem;
+    miLargeBoard: TMenuItem;
     miAbout: TMenuItem;
     Label4: TLabel;
     miPly7: TMenuItem;
@@ -46,12 +50,12 @@ type
     btnPrevMove: TBitBtn;
     btnNextMove: TBitBtn;
     btnLastMove: TBitBtn;
-    moyen1: TMenuItem;
+    miMediumBoard: TMenuItem;
     Effacerlesflches1: TMenuItem;
     miPly10: TMenuItem;
     miStop: TMenuItem;
-    Bleu1: TMenuItem;
-    Olive1: TMenuItem;
+    miTeal: TMenuItem;
+    miOlive: TMenuItem;
     Label5: TLabel;
     miPly11: TMenuItem;
     miPly12: TMenuItem;
@@ -65,11 +69,12 @@ type
     procedure FormResize(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    procedure miBoardCustomColorClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miExportGameClick(Sender: TObject);
     procedure Nouvellepartieaveclesblancs1Click(Sender: TObject);
-    procedure Grand1Click(Sender: TObject);
-    procedure rsgrand1Click(Sender: TObject);
+    procedure miSmallBoardClick(Sender: TObject);
+    procedure miLargeBoardClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miPly7Click(Sender: TObject);
     procedure miPly8Click(Sender: TObject);
@@ -84,11 +89,11 @@ type
     procedure btnNextMoveClick(Sender: TObject);
     procedure btnFirstMoveClick(Sender: TObject);
     procedure btnLastMoveClick(Sender: TObject);
-    procedure moyen1Click(Sender: TObject);
+    procedure miMediumBoardClick(Sender: TObject);
     procedure Effacerlesflches1Click(Sender: TObject);
     procedure miStopClick(Sender: TObject);
-    procedure Bleu1Click(Sender: TObject);
-    procedure Olive1Click(Sender: TObject);
+    procedure miTealClick(Sender: TObject);
+    procedure miOliveClick(Sender: TObject);
     procedure miPly11Click(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure miPly12Click(Sender: TObject);
@@ -124,13 +129,9 @@ begin
   EPD_encours := False;
   champ := TStrings.Create;
   randomize;
-  Couleur_Fond := 8421376;
+  Couleur_Fond := clTeal;
   DoubleBuffered := True;
-  left := 10;
-  top := 10;
   initialisation(posit);
-  largeur := 95;
-  PaintBoard(posit);
   largeur := 80;
   PaintBoard(posit);
   init_prof := 9;
@@ -159,7 +160,7 @@ begin
   Result := False;
 end;
 
-procedure inc_historique(la, labas, la_ef: integer);
+procedure inc_historique(const la, labas, la_ef: integer);
 begin
   Combien_hist := Index_hist;
   Inc(Combien_hist);
@@ -280,11 +281,11 @@ begin
     begin
       la := x div largeur + 8 * (y div largeur);
       detourne(li, co, la);
-      if ((posit.Cases[la] <= 0) and couleur_Ordi) or
-        ((posit.Cases[la] >= 0) and not couleur_Ordi) then
+      if ((Posit.Cases[la] <= 0) and Couleur_Ordi) or
+        ((Posit.Cases[la] >= 0) and not Couleur_Ordi) then
         exit;
       Coups_Possibles.Nb_pos := 0;
-      if couleur_Ordi then
+      if Couleur_Ordi then
       begin
         Cases_battues_par_noirs;
         Moves_white(Coups_Possibles, la);
@@ -306,27 +307,36 @@ begin
       detourne(li, co, labas);
       if danslaliste(labas, la_ef) then
       begin
-        if couleur_Ordi then
+        if Couleur_Ordi then
           promo := ((labas <= 7) and (Posit.Cases[la] = pion))
         else
           promo := ((labas >= 56) and (Posit.Cases[la] = pionNoir));
         PlayMove(la, labas, la_ef);
         if promo then {promotion pawn}
         begin
-          Posit.Cases[labas] := (1 - 2*ord(not couleur_Ordi))*Form2.ShowModal;
+          Posit.Cases[labas] := (1 - 2*ord(not Couleur_Ordi))*Form2.ShowModal;
           recalcule;
         end;
         inc_historique(la, labas, la_ef);
         Empile_Rep;
-        PaintBoard(posit);
+        PaintBoard(Posit);
         Mark_Square(la div 8, la mod 8, ClRed);
         Mark_Square(labas div 8, labas mod 8, ClRed);
         Ordinateur;
       end
       else
-        PaintBoard(posit);
+        PaintBoard(Posit);
     end;
     enabler(True, True, False, False);
+  end;
+end;
+
+procedure TForm1.miBoardCustomColorClick(Sender: TObject);
+begin
+  if ColorDialog1.Execute then
+  begin
+    Couleur_Fond := ColorDialog1.Color;
+    PaintBoard(posit_dessin);
   end;
 end;
 
@@ -357,7 +367,7 @@ begin
       posit := Lechiquier;
 
     AMoveSList := TStringList.Create;
-    for i := 1 to Combien_hist do // max plies
+    for i := Low(hist_int) to Combien_hist do // max plies
     begin
       AMoveSList.Add(mouv(hist_int[i].depart, hist_int[i].arrivee));
 
@@ -460,13 +470,13 @@ begin
   miPly9.Checked := True;
 end;
 
-procedure TForm1.Grand1Click(Sender: TObject);
+procedure TForm1.miSmallBoardClick(Sender: TObject);
 begin
   largeur := 60;
   PaintBoard(posit_dessin);
 end;
 
-procedure TForm1.rsgrand1Click(Sender: TObject);
+procedure TForm1.miLargeBoardClick(Sender: TObject);
 begin
   largeur := 95;
   PaintBoard(posit_dessin);
@@ -670,7 +680,7 @@ begin
   posit_dessin := posit;
 end;
 
-procedure TForm1.moyen1Click(Sender: TObject);
+procedure TForm1.miMediumBoardClick(Sender: TObject);
 begin
   largeur := 80;
   PaintBoard(posit_dessin);
@@ -686,48 +696,16 @@ begin
   stop := True;
 end;
 
-procedure change_couleur(de, enca: Tcolor);
-var
-  li, co, debut: integer;
-  ligne: boolean;
+procedure TForm1.miTealClick(Sender: TObject);
 begin
-  ligne := False;
-  form1.Image1.canvas.pen.Color := enca;
-  with form1.Image1 do
-    for li := 0 to Height do
-      for co := 0 to Width do
-        with canvas do
-        begin
-          if pixels[co, li] = de then
-          begin
-            if not ligne then
-            begin
-              ligne := True;
-              debut := co;
-            end;
-          end
-          else
-          begin
-            if ligne then
-            begin
-              ligne := False;
-              moveto(debut, li);
-              lineTo(co - 1, li);
-            end;
-          end;
-        end;
+  Couleur_Fond := clTeal;
+  PaintBoard(posit_dessin);
 end;
 
-procedure TForm1.Bleu1Click(Sender: TObject);
+procedure TForm1.miOliveClick(Sender: TObject);
 begin
-  Couleur_Fond := 8421376;
-  change_couleur(Clolive, 8421376);
-end;
-
-procedure TForm1.Olive1Click(Sender: TObject);
-begin
-  Couleur_Fond := ClOlive;
-  Change_Couleur(8421376, ClOlive);
+  Couleur_Fond := clOlive;
+  PaintBoard(posit_dessin);
 end;
 
 procedure TForm1.miPly11Click(Sender: TObject);

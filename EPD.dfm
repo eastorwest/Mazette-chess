@@ -3,7 +3,7 @@ object Form3: TForm3
   Height = 115
   Top = 467
   Width = 723
-  Caption = 'Form3'
+  Caption = 'EPD'
   ClientHeight = 115
   ClientWidth = 723
   Color = clBtnFace
@@ -15,8 +15,8 @@ object Form3: TForm3
     Left = 8
     Height = 13
     Top = 8
-    Width = 88
-    Caption = 'Enter or copy EPD'
+    Width = 108
+    Caption = 'Enter or copy EPD text'
     ParentColor = False
   end
   object Edit1: TEdit
@@ -55,8 +55,8 @@ object Form3: TForm3
       Left = 8
       Height = 19
       Top = 8
-      Width = 100
-      Caption = 'trait а l''ordinateur'
+      Width = 64
+      Caption = 'computer'
       Checked = True
       TabOrder = 0
       TabStop = True
@@ -65,8 +65,8 @@ object Form3: TForm3
       Left = 8
       Height = 19
       Top = 24
-      Width = 87
-      Caption = 'trait а l''humain'
+      Width = 52
+      Caption = 'human'
       TabOrder = 1
     end
   end

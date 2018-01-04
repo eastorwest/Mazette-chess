@@ -29,7 +29,7 @@ const
   valeurs_Cases: array[PionNoir..Pion + 3] of integer =
     (-110, -500, -400, -400, -1050, 0, 0, 0, 1050, 400, 400, 500, 110, 0, 0, 0);
   Couleur_Blanc = 15793141;
-  Couleur_Noir = 8421376;
+  Couleur_Noir = clTeal;
 
 type
   T_Tableau = array[0..63] of shortint;
@@ -62,9 +62,12 @@ type
 
 var
   Posit, Posit_dessin, lechiquier: T_Echiquier;
-  Coups_en_cours, partie_en_cours, Couleur_Ordi, stop, EPD_encours,
+  Coups_en_cours, partie_en_cours,
+  Couleur_Ordi, // current move turn
+  stop, EPD_encours,
   EPD_noir_dabord, EPD_swap: boolean;
-  best_depart, best_arrivee, best_efface, init_prof, largeur,
+  best_depart, best_arrivee, best_efface, init_prof,
+  largeur, // square size when painting
   Combien_hist, Index_hist, complexite, profope, la, combien_bib,
   Nb_repetition, Nb_Tour: integer;
   h: cardinal;

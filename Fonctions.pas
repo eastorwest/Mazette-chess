@@ -18,7 +18,7 @@ procedure marque_possible;
 function strint(const a: int64): string;
 procedure Initialisation(var posit: T_echiquier);
 procedure empile_Rep;
-procedure Fleche(dela, alabas: integer; couleur: TColor);
+procedure Fleche(const dela, alabas: integer; const couleur: TColor);
 procedure ecrire(la: integer; s: string);
 function EpdToEchiquier(s: string): boolean;
 procedure recalcule;
@@ -298,7 +298,7 @@ begin
   La_Pile_Rep[1] := Posit;
 end;
 
-procedure Fleche(dela, alabas: integer; couleur: TColor);
+procedure Fleche(const dela, alabas: integer; const couleur: TColor);
 var
   Norme, cX, cY: single;
   Ax, Ay, Bx, By, li, co: integer;
