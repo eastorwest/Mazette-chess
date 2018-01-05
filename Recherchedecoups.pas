@@ -12,7 +12,7 @@ implementation
 
 uses
   {$IFnDEF FPC} Windows,  {$ENDIF}
-  SysUtils, Dialogs, Forms, Math, Graphics,
+  SysUtils, Dialogs, Forms, Graphics, Math,
   Variables, Deplacements, Fonctions,
   Evaluation, Echec1, Plateau;
 
@@ -20,7 +20,6 @@ function feuilletrue(const beta: integer): integer;
 var
   j, i, Le_Meilleur, cbpb, evalu, perte: integer;
   encours: T_echiquier;
-
 begin
   encours := Posit;
   Le_Meilleur := -infini;
@@ -33,13 +32,13 @@ begin
         if cases[j] < 0 then
         begin
           Nb_Pos := 0;
-          Moves_black(coups_possibles, j);
+          Moves_black(coups_possibles, j, Posit);
           perte := -valeurs_cases[cases[j]] div 3;
           if Nb_Pos <> 0 then
           begin
             for i := 1 to Nb_pos do
             begin
-              jouertrue(position[i, 1], position[i, 2], position[i, 3]);
+              jouertrue(position[i, 1], position[i, 2], position[i, 3], Posit);
               evalu := evaluer(True) - cbpb;
               if cases_battues[position[i, 2]] <> 0 then
                 evalu := evalu - perte;
@@ -49,7 +48,7 @@ begin
                 Le_Meilleur := evalu;
                 if Le_Meilleur >= beta then
                 begin
-                  feuilletrue := Le_Meilleur;
+                  Result := Le_Meilleur;
                   exit;
                 end;
               end;
@@ -59,12 +58,12 @@ begin
       if evalu = -111111 then
       begin
         if souslefeu(Position_Roi[Noir], -1, False) then
-          feuilletrue := -infini + (profope - 1)
+          Result := -infini + (profope - 1)
         else
-          feuilletrue := 0;
+          Result := 0;
         exit;
       end;
-      feuilletrue := Le_Meilleur;
+      Result := Le_Meilleur;
       exit;
     end;
 end;
@@ -85,13 +84,13 @@ begin
         if cases[j] > 0 then
         begin
           Nb_Pos := 0;
-          Moves_white(coups_possibles, j);
+          Moves_white(coups_possibles, j, Posit);
           perte := valeurs_cases[cases[j]] div 3;
           if Nb_Pos <> 0 then
           begin
             for i := 1 to Nb_pos do
             begin
-              jouerfalse(position[i, 1], position[i, 2], position[i, 3]);
+              jouerfalse(position[i, 1], position[i, 2], position[i, 3], Posit);
               evalu := evaluer(False) - cbpn;
               if cases_battues[position[i, 2]] <> 0 then
                 evalu := evalu - perte;
@@ -101,7 +100,7 @@ begin
                 Le_Meilleur := evalu;
                 if Le_Meilleur >= beta then
                 begin
-                  feuillefalse := Le_Meilleur;
+                  Result := Le_Meilleur;
                   exit;
                 end;
               end;
@@ -111,12 +110,12 @@ begin
       if evalu = -111111 then
       begin
         if souslefeu(Position_Roi[Blanc], 1, False) then
-          feuillefalse := -infini + (profope - 1)
+          Result := -infini + (profope - 1)
         else
-          feuillefalse := 0;
+          Result := 0;
         exit;
       end;
-      feuillefalse := Le_Meilleur;
+      Result := Le_Meilleur;
       exit;
     end;
 end;
@@ -138,12 +137,12 @@ begin
   if profondeur = 1 then
     if color then
     begin
-      alphabeta := feuilletrue(beta);
+      Result := feuilletrue(beta);
       exit;
     end
     else
     begin
-      alphabeta := feuillefalse(beta);
+      Result := feuillefalse(beta);
       exit;
     end;
   encours := Posit;
@@ -156,17 +155,17 @@ begin
         if color then
         begin
           if souslefeu(Position_Roi[Noir], -1, False) then
-            AlphaBeta := -infini + (profope - profondeur)
+            Result := -infini + (profope - profondeur)
           else
-            AlphaBeta := 0;
+            Result := 0;
           exit;
         end
         else
         begin
           if souslefeu(Position_Roi[Blanc], 1, False) then
-            AlphaBeta := -infini + (profope - profondeur)
+            Result := -infini + (profope - profondeur)
           else
-            AlphaBeta := 0;
+            Result := 0;
           exit;
         end;
       for i := 1 to Nb_pos do
@@ -182,7 +181,7 @@ begin
       for i := 1 to Nb_pos do
       begin
         Application.ProcessMessages;
-        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3], Posit);
         {if color then evalu:=-feuillefalse(-alpha) else evalu:=-feuilletrue(-alpha);}
         evalu := -AlphaBeta(profondeur - 1, -beta, -alpha, not color);
         Posit := encours;
@@ -191,7 +190,7 @@ begin
           Le_Meilleur := evalu;
           if Le_Meilleur >= beta then
           begin
-            AlphaBeta := Le_Meilleur;
+            Result := Le_Meilleur;
             La_Pile_1 := position[i, 1];
             La_Pile_2 := position[i, 2];
             exit;
@@ -200,7 +199,7 @@ begin
         end;
       end;
     end;
-  AlphaBeta := Le_Meilleur;
+  Result := Le_Meilleur;
 end;
 
 function negascout(const profondeur, alpha, beta: integer;
@@ -213,13 +212,13 @@ var
 begin
   if profondeur = 2 then
   begin
-    Negascout := alphabeta(profondeur, alpha, beta, color);
+    Result := AlphaBeta(profondeur, alpha, beta, color);
     exit;
   end;
   {appelé à LA PROFONDEUR 2 seulement}
   if stop then
   begin
-    Negascout := 0;
+    Result := 0;
     exit;
   end;
   encours := Posit;
@@ -233,22 +232,22 @@ begin
         if color then
         begin
           if souslefeu(Position_Roi[Noir], -1, False) then
-            Negascout := -infini + (profope - profondeur)
+            Result := -infini + (profope - profondeur)
           else
-            Negascout := 0;
+            Result := 0;
           exit;
         end
         else
         begin
           if souslefeu(Position_Roi[Blanc], 1, False) then
-            Negascout := -infini + (profope - profondeur)
+            Result := -infini + (profope - profondeur)
           else
-            Negascout := 0;
+            Result := 0;
           exit;
         end;
       for i := 1 to Nb_pos do
       begin
-        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3], Posit);
         if (profondeur = profope - 1) then
           position[i, 4] := -AlphaBeta(2, -beta, -alpha, not color)
         else
@@ -256,7 +255,7 @@ begin
             3..4: position[i, 4] := evaluer(color);
             5..15: position[i, 4] := -AlphaBeta(1, -beta, -alpha, not color);
           end;
-        for j := 1 to min(i - 1, 6) do
+        for j := 1 to Min(i - 1, 6) do
           if (position[i, 4] > position[j, 4]) then
           begin
             temp := position[i];
@@ -270,7 +269,7 @@ begin
       for i := 1 to Nb_pos do
       begin
         Application.ProcessMessages;
-        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3], Posit);
         t := -Negascout(profondeur - 1, -b, -a, not color);
         if (t > a) then         {modif là !}
         begin
@@ -281,13 +280,13 @@ begin
         Posit := encours;
         if a >= beta then
         begin
-          Negascout := a;
+          Result := a;
           exit;
         end;
         b := a + 1;
       end;
     end;
-  Negascout := a;
+  Result := a;
 end;
 
 procedure Recherche(const color: boolean);
@@ -305,16 +304,16 @@ begin
   a := alpha;
   b := infini;
   enabler(False, False, False, False);
-  posit.Total := 0;
+  Posit.Total := 0;
   la_Pile_1 := 0;
   la_Pile_2 := 0;
-  encours := posit;
+  encours := Posit;
   Le_Meilleur := -infini;
   generer_liste_coup(liste_coup, color);
   if liste_coup.Nb_pos = 0 then
   begin
-    if (color and souslefeu(posit.Position_Roi[Noir], -1, False)) or
-      (not color and souslefeu(posit.Position_Roi[Blanc], 1, False)) then
+    if (color and souslefeu(Posit.Position_Roi[Noir], -1, False)) or
+      (not color and souslefeu(Posit.Position_Roi[Blanc], 1, False)) then
     begin
       ShowMessage('CheckMate !');
       partie_en_cours := False;
@@ -322,18 +321,18 @@ begin
     else
     begin
       ShowMessage('Nulle');
-      encours := posit;
+      encours := Posit;
       partie_en_cours := False;
     end;
     exit;
   end;
   h := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
-  form1.Timer1.Enabled := True;
+  Form1.Timer1.Enabled := True;
   with liste_coup do
   begin
     for i := 1 to Nb_pos do
     begin
-      PlayMove(position[i, 1], position[i, 2], position[i, 3]);
+      PlayMove(position[i, 1], position[i, 2], position[i, 3],Posit);
       position[i, 4] := -negascout(5, -infini, -alpha, not color);
       for j := 1 to i - 1 do
         if (position[i, 4] > position[j, 4]) then
@@ -344,7 +343,7 @@ begin
           position[j] := temp;
           break;
         end;
-      posit := encours;
+      Posit := encours;
     end;
     PaintBoard(posit_dessin);
     if Nb_pos = 1 then
@@ -357,27 +356,28 @@ begin
       for i := 1 to Nb_pos do
       begin
         Affiche;
-        if form1.Effacerlesflches1.Checked then
+        if Form1.Effacerlesflches1.Checked then
           PaintBoard(posit_dessin);
         if i > 1 then
           fleche(best_depart, best_arrivee, clgray);
         fleche(position[i, 1], position[i, 2], clBlue);
         if stop then
           exit;
-        PlayMove(position[i, 1], position[i, 2], position[i, 3]);
+        PlayMove(position[i, 1], position[i, 2], position[i, 3],Posit);
         t := -Negascout(profope - 1, -b, -a, not color);
         if (t > a) and (i > 1) then
           a := -Negascout(profope - 1, -infini, -t, not color);
-        a := max(a, t);
+        a := Max(a, t);
         Nb_Repetition := 0;
         for j := 1 to Taille_Pile_Rep do
-          if compareMem(@encours, @La_Pile_Rep[j], 64) then
+          if CompareMem(@encours, @La_Pile_Rep[j], 64) then
             Inc(Nb_Repetition);
         if annule then
           if Nb_repetition > 2 then
           begin
-            ShowMessage('L''ordinateur pouvait annuler en jouant : ' +
-              cartesien(position[i, 1]) + cartesien(position[i, 2]));
+            ShowMessage(
+              Format('L''ordinateur pouvait annuler en jouant: %s%s',
+                [ cartesien(position[i, 1]),cartesien(position[i, 2]) ]));
             if nb_pos > 1 then
               a := -infini;
             nb_repetition := 0;
@@ -391,15 +391,15 @@ begin
           best_efface := position[i, 3];
           if (le_meilleur > infini - 20) then
           begin
-            posit := encours;
+            Posit := encours;
             break;
           end;
         end;
-        posit := encours;
+        Posit := encours;
         b := a + 1;
       end;
   end;
-  form1.Timer1.Enabled := False;
+  Form1.Timer1.Enabled := False;
   Affiche;
 end;
 

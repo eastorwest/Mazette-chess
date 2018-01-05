@@ -16,12 +16,12 @@ function strg5(a: single): string;
 procedure Mark_Square(li, co: integer; c: Tcolor);
 procedure marque_possible;
 function strint(const a: int64): string;
-procedure Initialisation(var posit: T_echiquier);
+procedure Initialisation(var APosit: T_echiquier);
 procedure empile_Rep;
 procedure Fleche(const dela, alabas: integer; const couleur: TColor);
 procedure ecrire(la: integer; s: string);
 function EpdToEchiquier(s: string): boolean;
-procedure recalcule;
+procedure recalcule(var APosit: T_echiquier);
 function temps(z: cardinal): string;
 
 
@@ -198,10 +198,10 @@ begin
     i := random(combien_bib) + 1;
     depart := res_dep_int[i];
     arrivee := res_arr_int[i];
-    suivant := True;
+    Result := True;
     exit;
   end;
-  suivant := False;
+  Result := False;
 end;
 
 function strg5(a: single): string;
@@ -261,11 +261,11 @@ begin
   strint := s;
 end;
 
-procedure Initialisation(var posit: T_echiquier);
+procedure Initialisation(var APosit: T_echiquier);
 var
   i: integer;
 begin
-  with Posit do
+  with APosit do
   begin
     blanc_petit_roque := True;
     blanc_grand_roque := True;
@@ -286,7 +286,6 @@ begin
       pions_blancs[i] := 1;
     end;
   end;
-  posit_dessin := posit;
 end;
 
 procedure empile_Rep;
@@ -526,11 +525,11 @@ begin
   end;
 end;
 
-procedure recalcule;
+procedure recalcule(var APosit: T_echiquier);
 var
   I: integer;
 begin
-  with posit do
+  with APosit do
   begin
     Fillchar(pions_noirs, sizeOf(pions_noirs), 0);
     Fillchar(pions_blancs, sizeOf(pions_blancs), 0);
@@ -539,9 +538,9 @@ begin
     begin
       Inc(total, valeurs_Cases[cases[i]]);
       Inc(total, bonus[Cases[i], i]);
-      if cases[i] = pion then
+      if Cases[i] = pion then
         Inc(pions_blancs[i mod 8]);
-      if cases[i] = pionnoir then
+      if Cases[i] = pionnoir then
         Inc(pions_noirs[i mod 8]);
     end;
     for i := 0 to 7 do

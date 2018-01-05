@@ -8,13 +8,13 @@ interface
 uses Graphics, Math, Dialogs, Variables, Fonctions;
 
 function souslefeu(const po, s: integer; const from_generer: boolean): boolean;
-procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer);
-procedure Moves_white(var coups: T_Liste_Coup; const La_position: integer);
+procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
+procedure Moves_white(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
 function Cases_battues_par_blancs: integer;
 function Cases_battues_par_noirs: integer;
-procedure PlayMove(const Le_depart, Larrivee, Lefface: integer);
-procedure jouertrue(const Le_depart, Larrivee, Lefface: integer);
-procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer);
+procedure PlayMove(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
+procedure jouertrue(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
+procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 procedure generer_liste_coup(var coups: T_Liste_Coup; const color: boolean);
 
 implementation
@@ -291,14 +291,14 @@ begin
   Souslefeu := False;
 end;
 
-procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer);
+procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
 var
   i, li, co: integer;
   Sauv_posit: T_echiquier;
 
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
-    jouertrue(La_position, posi, Pre_efface);
+    jouertrue(La_position, posi, Pre_efface, APosit);
     if not souslefeu(posit.position_roi[True], -1, True) then
       with Coups do
       begin
@@ -307,7 +307,7 @@ var
         position[Nb_pos, 2] := Posi;
         position[Nb_pos, 3] := pre_efface;
       end;
-    posit := sauv_posit;
+    Aposit := sauv_posit;
   end;
 
   procedure Fou_Tour_Dame_Noir(const increment, combien: integer);
@@ -315,7 +315,7 @@ var
     i, dep: integer;
   begin
     dep := La_position;
-    with posit do
+    with Aposit do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -332,8 +332,8 @@ var
   end;
 
 begin
-  sauv_posit := posit;
-  with posit do
+  sauv_posit := APosit;
+  with APosit do
   begin
     li := La_position div 8;
     co := La_position mod 8;
@@ -417,14 +417,14 @@ begin
   end;
 end;
 
-procedure Moves_white(var coups: T_Liste_Coup; const la_position: integer);
+procedure Moves_white(var coups: T_Liste_Coup; const la_position: integer; var APosit: T_echiquier);
 var
   i, li, co: integer;
   Sauv_posit: T_echiquier;
 
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
-    jouerfalse(La_position, posi, Pre_efface);
+    jouerfalse(La_position, posi, Pre_efface, APosit);
     if not souslefeu(posit.position_roi[False], 1, True) then
       with Coups do
       begin
@@ -433,7 +433,7 @@ var
         position[Nb_pos, 2] := Posi;
         position[Nb_pos, 3] := pre_efface;
       end;
-    posit := sauv_posit;
+    Aposit := sauv_posit;
   end;
 
   procedure Fou_Tour_Dame_Blanc(const increment, combien: integer);
@@ -441,7 +441,7 @@ var
     i, dep: integer;
   begin
     dep := La_position;
-    with posit do
+    with Aposit do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -458,8 +458,8 @@ var
   end;
 
 begin
-  sauv_posit := posit;
-  with posit do
+  sauv_posit := Aposit;
+  with Aposit do
   begin
     li := La_position div 8;
     co := La_position mod 8;
@@ -705,11 +705,11 @@ begin
   Cases_battues_par_noirs := retour;
 end;
 
-procedure PlayMove(const Le_depart, Larrivee, Lefface: integer);
+procedure PlayMove(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 var
   prise: shortint;
 begin
-  with posit do
+  with APosit do
   begin
     prise := Cases[Larrivee];
     case prise of
@@ -759,7 +759,7 @@ begin
         begin
           Cases[Larrivee] := ReineNoir;
           Dec(pions_noirs[larrivee mod 8]);
-          recalcule;
+          recalcule(APosit);
         end
         else if Larrivee - Le_depart = 16 then
           dernier := Larrivee;
@@ -779,7 +779,7 @@ begin
         begin
           Cases[Larrivee] := Reine;
           Inc(pions_blancs[larrivee mod 8]);
-          recalcule;
+          recalcule(APosit);
         end
         else if Le_depart - Larrivee = 16 then
           dernier := Larrivee;
@@ -888,11 +888,11 @@ begin
   end;
 end;
 
-procedure jouertrue(const Le_depart, Larrivee, Lefface: integer);
+procedure jouertrue(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 var
   prise: shortint;
 begin
-  with posit do
+  with APosit do
   begin
     prise := cases[Larrivee];
     if prise = pion then
@@ -984,7 +984,7 @@ begin
         begin
           Cases[Larrivee] := ReineNoir;
           Dec(pions_noirs[larrivee mod 8]);
-          recalcule;
+          recalcule(APosit);
         end
         else if Larrivee - Le_depart = 16 then
           dernier := Larrivee;
@@ -993,7 +993,7 @@ begin
   end;
 end;
 
-procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer);
+procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 var
   prise: shortint;
 begin
@@ -1039,7 +1039,7 @@ begin
         begin
           Cases[Larrivee] := Reine;
           Inc(pions_blancs[larrivee mod 8]);
-          recalcule;
+          recalcule(APosit);
         end
         else if Le_depart - Larrivee = 16 then
           dernier := Larrivee;
@@ -1110,14 +1110,14 @@ begin
         Cases_battues_par_blancs;
         for La_Position := 63 downto 0 do
           if cases[La_Position] < 0 then
-            Moves_black(coups, La_Position);
+            Moves_black(coups, La_Position, Posit);
       end;
       False:
       begin
         Cases_battues_par_noirs;
         for La_Position := 0 to 63 do
           if cases[La_Position] > 0 then
-            Moves_white(coups, La_Position);
+            Moves_white(coups, La_Position, Posit);
       end;
     end;
 end;

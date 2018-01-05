@@ -168,31 +168,45 @@ object Form1: TForm1
       Caption = 'Depth'
       object miPly7: TMenuItem
         Caption = '7 ply   (t = 1)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly7Click
       end
       object miPly8: TMenuItem
         Caption = '8 ply   (x5)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly8Click
       end
       object miPly9: TMenuItem
         Caption = '9 ply   (x40)'
         Checked = True
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly9Click
       end
       object miPly10: TMenuItem
         Caption = '10 ply (x150)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly10Click
       end
       object miPly11: TMenuItem
         Caption = '11 ply (long!)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly11Click
       end
       object miPly12: TMenuItem
         Caption = '12 ply (very long!)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly12Click
       end
       object miPly13: TMenuItem
         Caption = '13 ply (very very long!)'
+        GroupIndex = 1
+        RadioItem = True
         OnClick = miPly13Click
       end
     end
@@ -210,7 +224,7 @@ object Form1: TForm1
       object miBoardColor: TMenuItem
         Caption = 'Color'
         object miTeal: TMenuItem
-          Caption = 'Blue'
+          Caption = 'Teal'
           OnClick = miTealClick
         end
         object miOlive: TMenuItem
@@ -226,14 +240,21 @@ object Form1: TForm1
         Caption = 'Size'
         object miSmallBoard: TMenuItem
           Caption = 'Small'
+          GroupIndex = 2
+          RadioItem = True
           OnClick = miSmallBoardClick
         end
         object miMediumBoard: TMenuItem
           Caption = 'Medium'
+          Checked = True
+          GroupIndex = 2
+          RadioItem = True
           OnClick = miMediumBoardClick
         end
         object miLargeBoard: TMenuItem
           Caption = 'Large'
+          GroupIndex = 2
+          RadioItem = True
           OnClick = miLargeBoardClick
         end
       end

@@ -9,8 +9,7 @@ uses
   {$IFnDEF FPC}
   Windows, Messages,
   {$ENDIF}
-  SysUtils, Classes, Graphics, Controls, Forms, StdCtrls, Buttons, ExtCtrls,
-  Variables, Plateau, Fonctions;
+  SysUtils, Classes, Graphics, Controls, Forms, StdCtrls, Buttons, ExtCtrls;
 
 type
   TForm3 = class(TForm)

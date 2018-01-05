@@ -9,12 +9,11 @@ function evaluer(const cote: boolean): integer;
 
 implementation
 
-uses SysUtils, Math, Variables;
+uses SysUtils, Variables;
 
 function evaluer(const cote: boolean): integer;
 var
   retour: integer;
-
 begin
   Inc(Nb_Eval);
   with posit do

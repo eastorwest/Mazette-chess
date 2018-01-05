@@ -5,7 +5,7 @@ unit Variables;
 
 interface
 
-uses IniFiles, Math, Graphics, Classes;
+uses Graphics, Classes;
 
 const
   Infini = 30000;
@@ -80,7 +80,6 @@ var
   Couleur_Fond: Tcolor;
   Nb_Eval: int64;
   cases_battues, zero: T_cases_battues;
-  champ: TStrings;
 
 const
   bonus: array [pionNoir..pion] of T_Tableau_integer =
