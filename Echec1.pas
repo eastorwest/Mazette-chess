@@ -10,7 +10,7 @@ uses
   Windows, Messages,
   {$ENDIF}
   SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ExtCtrls, StdCtrls,
-  ComCtrls, Menus, Buttons;
+  ComCtrls, Menus, Buttons, Types;
 
 type
 
@@ -69,6 +69,8 @@ type
     procedure FormResize(Sender: TObject);
     procedure Image1MouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
+    procedure Image1MouseWheel(Sender: TObject; Shift: TShiftState;
+      WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure miBoardCustomColorClick(Sender: TObject);
     procedure miExitClick(Sender: TObject);
     procedure miExportGameClick(Sender: TObject);
@@ -335,6 +337,15 @@ begin
     end;
     PanelEnabler(True, True, False, False);
   end;
+end;
+
+procedure TForm1.Image1MouseWheel(Sender: TObject; Shift: TShiftState;
+  WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+begin
+  if WheelDelta > 0 then
+    btnPrevMoveClick(Sender)
+  else
+    btnNextMoveClick(Sender);
 end;
 
 procedure TForm1.miBoardCustomColorClick(Sender: TObject);

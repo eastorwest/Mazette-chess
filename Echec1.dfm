@@ -27,6 +27,7 @@ object Form1: TForm1
     Constraints.MaxHeight = 1000
     Constraints.MaxWidth = 1000
     OnMouseDown = Image1MouseDown
+    OnMouseWheel = Image1MouseWheel
   end
   object Panel1: TPanel
     Left = 0
