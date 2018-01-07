@@ -12,14 +12,16 @@ uses
   SysUtils, Classes, Graphics, Controls, Forms, StdCtrls, Buttons, ExtCtrls;
 
 type
+
+  { TForm3 }
+
   TForm3 = class(TForm)
+    Button1: TButton;
     Edit1: TEdit;
-    BitBtn1: TBitBtn;
     Label1: TLabel;
-    Panel1: TPanel;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;
-    procedure BitBtn1Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { private declarations }
   public
@@ -33,7 +35,9 @@ implementation
 
 {$R *.dfm}
 
-procedure TForm3.BitBtn1Click(Sender: TObject);
+{ TForm3 }
+
+procedure TForm3.Button1Click(Sender: TObject);
 begin
   Close;
 end;

@@ -7,20 +7,19 @@ interface
 
 uses Graphics, Variables;
 
-function mouv(const de, ar: integer): T_str12;
-procedure enabler(const def0b, defb, refb, refttb: boolean);
+function mouv(const de, ar: integer; const APosit: T_echiquier): T_str12;
+procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
 function cartesien(const ca: integer): T_str2;
 function enchiffre(const s: T_str2): integer;
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
-function strg5(a: single): string;
 procedure Mark_Square(li, co: integer; c: Tcolor);
 procedure marque_possible;
 function strint(const a: int64): string;
-procedure Initialisation(var APosit: T_echiquier);
+procedure Initialisation(out APosit: T_echiquier);
 procedure empile_Rep;
-procedure Fleche(const dela, alabas: integer; const couleur: TColor);
+procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
 procedure ecrire(la: integer; s: string);
-function EpdToEchiquier(s: string): boolean;
+function EpdToEchiquier(s: string; var APosit: T_Echiquier): boolean;
 procedure recalcule(var APosit: T_echiquier);
 function temps(z: cardinal): string;
 
@@ -30,31 +29,22 @@ implementation
 uses {$IFnDEF FPC} Windows,  {$ENDIF}
   Forms, Dialogs, Classes, SysUtils, Echec1, Plateau;
 
-function mouv(const de, ar: integer): T_str12;
+function mouv(const de, ar: integer; const APosit: T_echiquier): T_str12;
 var
   Quoi, lien: T_str2;
 begin
   Result := '';
-  with posit do
+  with APosit do
   begin
     Quoi := '';
     lien := '';
-    if abs(Cases[de]) = Roi then
-      Quoi := 'K' // King
-    else
-    if abs(Cases[de]) = Reine then
-      Quoi := 'Q' // Queen
-    else
-    if abs(Cases[de]) = Tour then
-      Quoi := 'R' // Rook
-    else
-    if abs(Cases[de]) = Fou then
-      Quoi := 'B' // Bishop
-    else
-    if abs(Cases[de]) = Cavalier then
-      Quoi := 'N' // Knight
-    else
-      Quoi := '';
+    case abs(Cases[de]) of
+      Roi: Quoi := 'K'; // King
+      Reine: Quoi := 'Q'; // Queen
+      Tour: Quoi := 'R'; // Rook
+      Fou: Quoi := 'B'; // Bishop
+      Cavalier: Quoi := 'N'; // Knight
+    end;
     if Cases[ar] <> Vide then
       lien := 'x'
     else
@@ -76,14 +66,14 @@ begin
   end;
 end;
 
-procedure enabler(const def0b, defb, refb, refttb: boolean);
+procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
 begin
-  with form1 do
+  with Form1 do
   begin
-    btnFirstMove.Enabled := def0b;
-    btnPrevMove.Enabled := defb;
-    btnNextMove.Enabled := refb;
-    btnLastMove.Enabled := refttb;
+    btnFirstMove.Enabled := btn1;
+    btnPrevMove.Enabled := btn2;
+    btnNextMove.Enabled := btn3;
+    btnLastMove.Enabled := btn4;
   end;
 end;
 
@@ -126,7 +116,7 @@ function dedans(const s, laboite: string): boolean;
     ilyest: boolean;
     cou, danscou: array[1..20] of T_Str4;
   begin
-    cestdedans := False;
+    Result := False;
     i := dou;
     Nbcou := 0;
     while i < length(laboite) do
@@ -152,7 +142,7 @@ function dedans(const s, laboite: string): boolean;
       if not Ilyest then
         exit;
     end;
-    cestdedans := True;
+    Result := True;
   end;
 
 begin
@@ -195,7 +185,7 @@ begin
 
   if combien_bib > 0 then
   begin
-    i := random(combien_bib) + 1;
+    i := Random(combien_bib) + 1;
     depart := res_dep_int[i];
     arrivee := res_arr_int[i];
     Result := True;
@@ -204,24 +194,9 @@ begin
   Result := False;
 end;
 
-function strg5(a: single): string;
-var
-  s: string;
-begin
-  str(a: 7: 5, s);
-  if a = 0 then
-    s := '0';
-  if pos('.', s) <> 0 then
-    while s[length(s)] = '0' do
-      Delete(s, length(s), 1);
-  if s[length(s)] = '.' then
-    Delete(s, length(s), 1);
-  Strg5 := s;
-end;
-
 procedure Mark_Square(li, co: integer; c: Tcolor);
 begin
-  with form1.image1.canvas do
+  with Form1.image1.canvas do
   begin
     tourne(li, co);
     Pen.Color := c;
@@ -258,10 +233,10 @@ begin
     if compteur > 0 then
       compteur := compteur mod 3;
   end;
-  strint := s;
+  Result := s;
 end;
 
-procedure Initialisation(var APosit: T_echiquier);
+procedure Initialisation(out APosit: T_echiquier);
 var
   i: integer;
 begin
@@ -286,6 +261,7 @@ begin
       pions_blancs[i] := 1;
     end;
   end;
+  recalcule(APosit);
 end;
 
 procedure empile_Rep;
@@ -297,7 +273,7 @@ begin
   La_Pile_Rep[1] := Posit;
 end;
 
-procedure Fleche(const dela, alabas: integer; const couleur: TColor);
+procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
 var
   Norme, cX, cY: single;
   Ax, Ay, Bx, By, li, co: integer;
@@ -305,19 +281,19 @@ begin
   li := deLa div 8;
   co := deLa mod 8;
   tourne(li, co);
-  Ax := round((co + 0.5) * largeur);
-  Ay := round((li + 0.5) * largeur);
+  Ax := Round((co + 0.5) * largeur);
+  Ay := Round((li + 0.5) * largeur);
   li := alabas div 8;
   co := alabas mod 8;
   tourne(li, co);
-  Bx := round((co + 0.5) * largeur);
-  By := round((li + 0.5) * largeur);
+  Bx := Round((co + 0.5) * largeur);
+  By := Round((li + 0.5) * largeur);
   Norme := SQRT((BX - AX) * (BX - AX) + (BY - AY) * (BY - AY));
   if (Norme = 0) then
     Exit;
   cX := (BX - AX) / Norme;
   cY := (BY - AY) / Norme;
-  with form1.image1.canvas do
+  with Form1.image1.canvas do
   begin
     Pen.Width := 3;
     Pen.Color := couleur;
@@ -339,7 +315,7 @@ begin
   li := La div 8;
   co := La mod 8;
   tourne(li, co);
-  with form1.image1.canvas do
+  with Form1.image1.canvas do
     textout(round((co + 0.75) * largeur), round((li + 0.75) * largeur), s);
 end;
 
@@ -370,35 +346,37 @@ begin
   end;
 end;
 
-function EpdToEchiquier(s: string): boolean;
+function EpdToEchiquier(s: string; var APosit: T_Echiquier): boolean;
 var
   lu: char;
   curseur, ligne, colonne, position, lapiece, i: integer;
   mot: string[128];
   lastr: T_str2;
   la: shortint;
+  lechiquier: T_Echiquier;
 
-  function degage_mot: string;
+  function degage_mot(): string;
   begin
     while (length(s) > 0) and (s[1] = ' ') do
       Delete(s, 1, 1);
-    if pos(' ', s) > 0 then
+    if Pos(' ', s) > 0 then
     begin
-      degage_mot := Copy(s, 1, Pos(' ', s) - 1);
-      Delete(s, 1, pos(' ', s));
+      Result := Copy(s, 1, Pos(' ', s) - 1);
+      Delete(s, 1, Pos(' ', s));
     end
     else
     begin
-      degage_mot := s;
+      Result := s;
       s := '';
     end;
   end;
 
 begin
+  Initialisation(lechiquier);
   with lechiquier do     { merci à ?}
   begin
-    EpdToEchiquier := False;
-    mot := degage_mot;
+    Result := False;
+    mot := degage_mot();
     if mot = '' then
       exit;
     curseur := 1;
@@ -463,10 +441,10 @@ begin
         'R': lapiece := Tour;
         'Q': lapiece := Reine;
         'K': lapiece := Roi;
-        '*': lapiece := vide;
+        '*': lapiece := Vide;
       end;
       position := colonne + ligne * 8;
-      cases[position] := lapiece;
+      Cases[position] := lapiece;
       if lu <> '/' then
         Inc(colonne);
       if (colonne > 7) then
@@ -476,14 +454,14 @@ begin
       end;
       Inc(Curseur);
     end;
-    mot := degage_mot;
+    mot := degage_mot();
     if mot = '' then
       exit;
-    if pos('w', mot) > 0 then
+    if Pos('w', mot) > 0 then
       couleur_ordi := False; {trait blanc}
-    if pos('b', mot) > 0 then
-      couleur_ordi := True;{trait noir}
-    mot := degage_mot;
+    if Pos('b', mot) > 0 then
+      couleur_ordi := True; {trait noir}
+    mot := degage_mot();
     if mot = '' then
       exit;
     blanc_petit_roque := (Pos('K', mot) > 0);
@@ -493,17 +471,17 @@ begin
     Fillchar(pions_noirs, sizeOf(pions_noirs), 0);
     Fillchar(pions_blancs, sizeOf(pions_blancs), 0);
     for i := 0 to 63 do
-      case cases[i] of
-        roi: position_roi[blanc] := i;
-        roinoir: position_roi[noir] := i;
-        pion: Inc(pions_blancs[i mod 8]);
-        pionnoir: Inc(pions_noirs[i mod 8]);
+      case Cases[i] of
+        Roi: position_roi[blanc] := i;
+        Roinoir: position_roi[noir] := i;
+        Pion: Inc(pions_blancs[i mod 8]);
+        Pionnoir: Inc(pions_noirs[i mod 8]);
       end;
     roque_blanc := not (blanc_petit_roque and blanc_grand_roque) and
       (position_roi[blanc] <> 60);
     roque_noir := not (noir_petit_roque and noir_grand_roque) and
       (position_roi[noir] <> 4);
-    mot := degage_mot;
+    mot := degage_mot();
     if mot = '' then
       exit;
     dernier := 0;
@@ -519,9 +497,9 @@ begin
         Inc(la, 8);
       dernier := la;
     end;
-    EpdToEchiquier := True;
-    posit := lechiquier;
-    PaintBoard(posit);
+    Result := True;
+    recalcule(lechiquier);
+    APosit := lechiquier;
   end;
 end;
 

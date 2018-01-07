@@ -58,8 +58,8 @@ procedure detourne(var li, co, la: integer);
 var
   t, i: integer;
 begin
-  li := La div 8;
-  co := La mod 8;
+  li := la div 8;
+  co := la mod 8;
   for i := 1 to Nb_Tour do
   begin
     t := co;

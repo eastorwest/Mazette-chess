@@ -7,7 +7,7 @@ interface
 
 uses Graphics, Math, Dialogs, Variables, Fonctions;
 
-function souslefeu(const po, s: integer; const from_generer: boolean): boolean;
+function souslefeu(const po, s: integer; const from_generer: boolean; const APosit: T_Echiquier): boolean;
 procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
 procedure Moves_white(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
 function Cases_battues_par_blancs: integer;
@@ -15,11 +15,11 @@ function Cases_battues_par_noirs: integer;
 procedure PlayMove(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 procedure jouertrue(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
-procedure generer_liste_coup(var coups: T_Liste_Coup; const color: boolean);
+procedure GenerateMoveList(const color: boolean; var APosit: T_Echiquier; var coups: T_Liste_Coup);
 
 implementation
 
-function souslefeu(const po, s: integer; const from_generer: boolean): boolean;
+function souslefeu(const po, s: integer; const from_generer: boolean; const APosit: T_Echiquier): boolean;
 var
   li, co, ou, i: integer;
 begin
@@ -37,13 +37,13 @@ begin
       Cases_battues_par_noirs;
   if cases_battues[po] = 0 then
   begin
-    Souslefeu := False;
+    Result := False;
     exit;
   end;
   li := po div 8;
   co := po mod 8;
-  Souslefeu := True;
-  with posit do
+  Result := True;
+  with APosit do
     if s = -1 then
     begin
       if cases_battues[po] and 32 = 32 then
@@ -288,7 +288,7 @@ begin
           (Abs(co - (Position_Roi[Noir] mod 8)) < 2) then
           exit;
     end;
-  Souslefeu := False;
+  Result := False;
 end;
 
 procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
@@ -299,7 +299,7 @@ var
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
     jouertrue(La_position, posi, Pre_efface, APosit);
-    if not souslefeu(posit.position_roi[True], -1, True) then
+    if not souslefeu(posit.position_roi[True], -1, True, APosit) then
       with Coups do
       begin
         Inc(Nb_pos);
@@ -347,16 +347,16 @@ begin
           if Cases[7] = TourNoir then
             if Cases[5] = 0 then
               if Cases[6] = 0 then
-                if not souslefeu(5, -1, True) then
-                  if not souslefeu(La_position, -1, True) then
+                if not souslefeu(5, -1, True, APosit) then
+                  if not souslefeu(La_position, -1, True, APosit) then
                     pre_undeplus(6, La_position);
         if noir_grand_roque then
           if Cases[0] = TourNoir then
             if Cases[1] = 0 then
               if Cases[2] = 0 then
                 if Cases[3] = 0 then
-                  if not souslefeu(3, -1, True) then
-                    if not souslefeu(La_position, -1, True) then
+                  if not souslefeu(3, -1, True, APosit) then
+                    if not souslefeu(La_position, -1, True, APosit) then
                       pre_undeplus(2, La_position);
       end;
       ReineNoir:
@@ -425,7 +425,7 @@ var
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
     jouerfalse(La_position, posi, Pre_efface, APosit);
-    if not souslefeu(posit.position_roi[False], 1, True) then
+    if not souslefeu(posit.position_roi[False], 1, True, APosit) then
       with Coups do
       begin
         Inc(Nb_pos);
@@ -527,16 +527,16 @@ begin
           if Cases[63] = Tour then
             if Cases[61] = 0 then
               if Cases[62] = 0 then
-                if not souslefeu(61, 1, True) then
-                  if not souslefeu(La_position, 1, True) then
+                if not souslefeu(61, 1, True, APosit) then
+                  if not souslefeu(La_position, 1, True, APosit) then
                     pre_undeplus(62, La_position);
         if blanc_grand_roque then
           if Cases[56] = Tour then
             if Cases[57] = 0 then
               if Cases[58] = 0 then
                 if Cases[59] = 0 then
-                  if not souslefeu(59, 1, True) then
-                    if not souslefeu(La_position, 1, True) then
+                  if not souslefeu(59, 1, True, APosit) then
+                    if not souslefeu(La_position, 1, True, APosit) then
                       pre_undeplus(58, La_position);
       end;
     end;
@@ -617,7 +617,7 @@ begin
               hou(The_position + Deplacement_Roi[i], 16);
         end;
       end;
-  Cases_battues_par_blancs := retour;
+  Result := retour;
 end;
 
 function Cases_battues_par_noirs: integer;
@@ -702,7 +702,7 @@ begin
               hou(The_position + Deplacement_Roi[i], 16);
         end;
       end;
-  Cases_battues_par_noirs := retour;
+  Result := retour;
 end;
 
 procedure PlayMove(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
@@ -894,7 +894,7 @@ var
 begin
   with APosit do
   begin
-    prise := cases[Larrivee];
+    prise := Cases[Larrivee];
     if prise = pion then
     begin
       Dec(pions_blancs[larrivee mod 8]);
@@ -1098,26 +1098,26 @@ begin
   end;
 end;
 
-procedure generer_liste_coup(var coups: T_Liste_Coup; const color: boolean);
+procedure GenerateMoveList(const color: boolean; var APosit: T_Echiquier; var coups: T_Liste_Coup);
 var
   la_position: integer;
 begin
-  Coups.Nb_Pos := 0;
-  with posit do
+  coups.Nb_Pos := 0;
+  with APosit do
     case color of
       True:
       begin
         Cases_battues_par_blancs;
         for La_Position := 63 downto 0 do
-          if cases[La_Position] < 0 then
-            Moves_black(coups, La_Position, Posit);
+          if Cases[La_Position] < 0 then
+            Moves_black(coups, La_Position, APosit);
       end;
       False:
       begin
         Cases_battues_par_noirs;
         for La_Position := 0 to 63 do
-          if cases[La_Position] > 0 then
-            Moves_white(coups, La_Position, Posit);
+          if Cases[La_Position] > 0 then
+            Moves_white(coups, La_Position, APosit);
       end;
     end;
 end;

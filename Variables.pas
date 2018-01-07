@@ -61,14 +61,17 @@ type
   T_cases_battues = array[0..63] of byte;
 
 var
-  Posit, Posit_dessin, lechiquier: T_Echiquier;
-  Coups_en_cours, partie_en_cours,
-  Couleur_Ordi, // current move turn
+  Posit, Posit_dessin, InitPos: T_Echiquier;
+  Coups_en_cours,
+  IsPlayOn, // game enabled
+  Couleur_Ordi, // current move turn. True - white, False - black
   stop, EPD_encours,
   EPD_noir_dabord, EPD_swap: boolean;
   best_depart, best_arrivee, best_efface, init_prof,
   largeur, // square size when painting
-  Combien_hist, Index_hist, complexite, profope, la, combien_bib,
+  Combien_hist,
+  Index_hist, // current move index in history array
+  complexite, profope, la, combien_bib,
   Nb_repetition, Nb_Tour: integer;
   h: cardinal;
   Coups_possibles: T_Liste_Coup;

@@ -38,34 +38,30 @@ object Form1: TForm1
     ClientWidth = 843
     TabOrder = 0
     object Label1: TLabel
-      Left = 136
-      Height = 13
-      Top = 6
-      Width = 21
+      Left = 167
+      Height = 24
+      Top = 0
+      Width = 209
+      AutoSize = False
       Caption = '       '
       ParentColor = False
     end
     object Label4: TLabel
-      Left = 403
-      Height = 1
-      Top = 6
-      Width = 1
+      Left = 384
+      Height = 24
+      Top = 0
+      Width = 39
+      AutoSize = False
       Font.Color = clWindowText
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       ParentColor = False
       ParentFont = False
     end
-    object Label5: TLabel
-      Left = 552
-      Height = 1
-      Top = 8
-      Width = 1
-      ParentColor = False
-    end
     object btnFirstMove: TBitBtn
       Left = 0
       Height = 25
+      Hint = 'Initial position'
       Top = 0
       Width = 33
       Caption = '<<'
@@ -81,6 +77,7 @@ object Form1: TForm1
     object btnPrevMove: TBitBtn
       Left = 32
       Height = 25
+      Hint = 'Previous move'
       Top = 0
       Width = 33
       Caption = '<'
@@ -94,8 +91,9 @@ object Form1: TForm1
       TabOrder = 1
     end
     object btnNextMove: TBitBtn
-      Left = 64
+      Left = 96
       Height = 25
+      Hint = 'Next move'
       Top = 0
       Width = 33
       Caption = '>'
@@ -109,8 +107,9 @@ object Form1: TForm1
       TabOrder = 2
     end
     object btnLastMove: TBitBtn
-      Left = 96
+      Left = 128
       Height = 25
+      Hint = 'Last move'
       Top = 0
       Width = 33
       Caption = '>>'
@@ -122,6 +121,22 @@ object Form1: TForm1
       OnClick = btnLastMoveClick
       ParentFont = False
       TabOrder = 3
+    end
+    object btnStop: TBitBtn
+      Left = 64
+      Height = 25
+      Hint = 'Last move'
+      Top = 0
+      Width = 33
+      Caption = '| |'
+      Enabled = False
+      Font.Color = clWindowText
+      Font.Height = -12
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      OnClick = btnStopClick
+      ParentFont = False
+      TabOrder = 4
     end
   end
   object MainMenu1: TMainMenu
@@ -158,11 +173,6 @@ object Form1: TForm1
         Caption = 'Exit'
         OnClick = miExitClick
       end
-    end
-    object miStop: TMenuItem
-      Caption = 'Stop'
-      Visible = False
-      OnClick = miStopClick
     end
     object miDepth: TMenuItem
       Caption = 'Depth'
