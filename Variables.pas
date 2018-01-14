@@ -5,7 +5,7 @@ unit Variables;
 
 interface
 
-uses Graphics, Classes;
+uses Graphics;
 
 const
   Infini = 30000;
@@ -50,9 +50,10 @@ type
   end;
   T_Element = array[1..4] of integer;
 
+  {Move list}
   T_Liste_Coup = record
-    position: array[0..127] of T_Element;
-    Nb_pos: integer;
+    position: array[0..127] of T_Element; // moves
+    Nb_pos: integer; // count of moves in list
   end;
   T_str100 = string[100];
   T_str12 = string[12];
@@ -62,26 +63,25 @@ type
 
 var
   Posit, Posit_dessin, InitPos: T_Echiquier;
-  Coups_en_cours,
+  IsMoveInput,
   IsPlayOn, // game enabled
+  stop, // game being stopping
   Couleur_Ordi, // current move turn. True - white, False - black
-  stop, EPD_encours,
-  EPD_noir_dabord, EPD_swap: boolean;
+  EPD_encours, EPD_noir_dabord, EPD_swap: boolean;
   best_depart, best_arrivee, best_efface, init_prof,
   largeur, // square size when painting
   Combien_hist,
   Index_hist, // current move index in history array
-  complexite, profope, la, combien_bib,
+  complexite, profope,
   Nb_repetition, Nb_Tour: integer;
   h: cardinal;
-  Coups_possibles: T_Liste_Coup;
-  historique, nomdefichier: string;
+  Coups_possibles: T_Liste_Coup; // valid move list
   hist_int: array[1..200] of Trois_int;
   res_dep_int, res_arr_int: array[1..1500] of integer;
   La_Pile_1, la_Pile_2: integer;
   la_Pile_Rep: array[0..Taille_Pile_Rep] of T_echiquier;
   Couleur_Fond: Tcolor;
-  Nb_Eval: int64;
+  Nb_Eval: int64; // count of calls evaluation function
   cases_battues, zero: T_cases_battues;
 
 const
@@ -329,7 +329,6 @@ const
     (-17, -10, 6, 15, 17, 10, -6, -15, -17, -10, 6, 15, 17);
 
 // bibliotheque d'ouvertures
-var
   debut: array[1..14536] of byte = (48, 40, 11, 27, 100,
     { **********************correspond à a2a3d7d5 **************************}
     48, 40, 12, 28, 100, 48, 40, 12, 28, 50, 34, 6, 21, 57, 42, 11, 27, 100, 48, 40, 12, 28,

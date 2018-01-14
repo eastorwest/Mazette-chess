@@ -1,11 +1,11 @@
 object Form1: TForm1
   Left = 385
-  Height = 706
+  Height = 343
   Top = 198
-  Width = 843
+  Width = 563
   Caption = 'Mazette'
-  ClientHeight = 686
-  ClientWidth = 843
+  ClientHeight = 323
+  ClientWidth = 563
   Color = clBtnFace
   Constraints.MaxHeight = 900
   Font.Color = clWindowText
@@ -20,9 +20,9 @@ object Form1: TForm1
   LCLVersion = '1.8.0.6'
   object Image1: TImage
     Left = 0
-    Height = 661
+    Height = 298
     Top = 25
-    Width = 843
+    Width = 563
     Align = alClient
     Constraints.MaxHeight = 1000
     Constraints.MaxWidth = 1000
@@ -33,10 +33,10 @@ object Form1: TForm1
     Left = 0
     Height = 25
     Top = 0
-    Width = 843
+    Width = 563
     Align = alTop
     ClientHeight = 25
-    ClientWidth = 843
+    ClientWidth = 563
     TabOrder = 0
     object Label1: TLabel
       Left = 167
@@ -48,10 +48,10 @@ object Form1: TForm1
       ParentColor = False
     end
     object Label4: TLabel
-      Left = 384
+      Left = 368
       Height = 24
       Top = 0
-      Width = 39
+      Width = 186
       AutoSize = False
       Font.Color = clWindowText
       Font.Height = -12

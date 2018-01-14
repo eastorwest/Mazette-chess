@@ -5,17 +5,17 @@ unit Deplacements;
 
 interface
 
-uses Graphics, Math, Dialogs, Variables, Fonctions;
+uses Math, Variables, Fonctions;
 
 function souslefeu(const po, s: integer; const from_generer: boolean; const APosit: T_Echiquier): boolean;
-procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
-procedure Moves_white(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
-function Cases_battues_par_blancs: integer;
-function Cases_battues_par_noirs: integer;
+procedure Moves_black(const La_position: integer; const APosit: T_echiquier; var coups: T_Liste_Coup);
+procedure Moves_white(const La_position: integer; const APosit: T_echiquier; var coups: T_Liste_Coup);
+function Cases_battues_par_blancs(const APosit: T_echiquier): integer;
+function Cases_battues_par_noirs(const APosit: T_echiquier): integer;
 procedure PlayMove(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 procedure jouertrue(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
 procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer; var APosit: T_echiquier);
-procedure GenerateMoveList(const color: boolean; var APosit: T_Echiquier; var coups: T_Liste_Coup);
+procedure GenerateMoveList(const color: boolean; const APosit: T_Echiquier; out coups: T_Liste_Coup);
 
 implementation
 
@@ -32,9 +32,9 @@ begin
   64:TourDame-}
   if not from_Generer then
     if s = -1 then
-      Cases_battues_par_blancs
+      Cases_battues_par_blancs(APosit)
     else
-      Cases_battues_par_noirs;
+      Cases_battues_par_noirs(APosit);
   if cases_battues[po] = 0 then
   begin
     Result := False;
@@ -291,23 +291,23 @@ begin
   Result := False;
 end;
 
-procedure Moves_black(var coups: T_Liste_Coup; const La_position: integer; var APosit: T_echiquier);
+procedure Moves_black(const La_position: integer; const APosit: T_echiquier; var coups: T_Liste_Coup);
 var
   i, li, co: integer;
-  Sauv_posit: T_echiquier;
+  APosit_Copy: T_echiquier;
 
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
-    jouertrue(La_position, posi, Pre_efface, APosit);
-    if not souslefeu(posit.position_roi[True], -1, True, APosit) then
-      with Coups do
+    jouertrue(La_position, posi, Pre_efface, APosit_Copy);
+    if not souslefeu(APosit_Copy.position_roi[True], -1, True, APosit_Copy) then
+      with coups do
       begin
         Inc(Nb_pos);
         position[Nb_pos, 1] := La_position;
         position[Nb_pos, 2] := Posi;
         position[Nb_pos, 3] := pre_efface;
       end;
-    Aposit := sauv_posit;
+    APosit_Copy := APosit;
   end;
 
   procedure Fou_Tour_Dame_Noir(const increment, combien: integer);
@@ -315,7 +315,7 @@ var
     i, dep: integer;
   begin
     dep := La_position;
-    with Aposit do
+    with APosit_Copy do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -332,8 +332,8 @@ var
   end;
 
 begin
-  sauv_posit := APosit;
-  with APosit do
+  APosit_Copy := APosit;
+  with APosit_Copy do
   begin
     li := La_position div 8;
     co := La_position mod 8;
@@ -347,16 +347,16 @@ begin
           if Cases[7] = TourNoir then
             if Cases[5] = 0 then
               if Cases[6] = 0 then
-                if not souslefeu(5, -1, True, APosit) then
-                  if not souslefeu(La_position, -1, True, APosit) then
+                if not souslefeu(5, -1, True, APosit_Copy) then
+                  if not souslefeu(La_position, -1, True, APosit_Copy) then
                     pre_undeplus(6, La_position);
         if noir_grand_roque then
           if Cases[0] = TourNoir then
             if Cases[1] = 0 then
               if Cases[2] = 0 then
                 if Cases[3] = 0 then
-                  if not souslefeu(3, -1, True, APosit) then
-                    if not souslefeu(La_position, -1, True, APosit) then
+                  if not souslefeu(3, -1, True, APosit_Copy) then
+                    if not souslefeu(La_position, -1, True, APosit_Copy) then
                       pre_undeplus(2, La_position);
       end;
       ReineNoir:
@@ -417,15 +417,15 @@ begin
   end;
 end;
 
-procedure Moves_white(var coups: T_Liste_Coup; const la_position: integer; var APosit: T_echiquier);
+procedure Moves_white(const La_position: integer; const APosit: T_echiquier; var coups: T_Liste_Coup);
 var
   i, li, co: integer;
-  Sauv_posit: T_echiquier;
+  APosit_Copy: T_echiquier;
 
   procedure pre_undeplus(const Posi, pre_efface: integer);
   begin
-    jouerfalse(La_position, posi, Pre_efface, APosit);
-    if not souslefeu(posit.position_roi[False], 1, True, APosit) then
+    jouerfalse(La_position, posi, Pre_efface, APosit_Copy);
+    if not souslefeu(APosit_Copy.position_roi[False], 1, True, APosit_Copy) then
       with Coups do
       begin
         Inc(Nb_pos);
@@ -433,7 +433,7 @@ var
         position[Nb_pos, 2] := Posi;
         position[Nb_pos, 3] := pre_efface;
       end;
-    Aposit := sauv_posit;
+    APosit_Copy := APosit;
   end;
 
   procedure Fou_Tour_Dame_Blanc(const increment, combien: integer);
@@ -441,7 +441,7 @@ var
     i, dep: integer;
   begin
     dep := La_position;
-    with Aposit do
+    with APosit_Copy do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -458,8 +458,8 @@ var
   end;
 
 begin
-  sauv_posit := Aposit;
-  with Aposit do
+  APosit_Copy := APosit;
+  with APosit_Copy do
   begin
     li := La_position div 8;
     co := La_position mod 8;
@@ -527,23 +527,23 @@ begin
           if Cases[63] = Tour then
             if Cases[61] = 0 then
               if Cases[62] = 0 then
-                if not souslefeu(61, 1, True, APosit) then
-                  if not souslefeu(La_position, 1, True, APosit) then
+                if not souslefeu(61, 1, True, APosit_Copy) then
+                  if not souslefeu(La_position, 1, True, APosit_Copy) then
                     pre_undeplus(62, La_position);
         if blanc_grand_roque then
           if Cases[56] = Tour then
             if Cases[57] = 0 then
               if Cases[58] = 0 then
                 if Cases[59] = 0 then
-                  if not souslefeu(59, 1, True, APosit) then
-                    if not souslefeu(La_position, 1, True, APosit) then
+                  if not souslefeu(59, 1, True, APosit_Copy) then
+                    if not souslefeu(La_position, 1, True, APosit_Copy) then
                       pre_undeplus(58, La_position);
       end;
     end;
   end;
 end;
 
-function Cases_battues_par_blancs: integer;
+function Cases_battues_par_blancs(const APosit: T_echiquier): integer;
 var
   i, li, co, The_position, retour: integer;
 
@@ -558,7 +558,7 @@ var
     i, dep: integer;
   begin
     dep := The_position;
-    with posit do
+    with APosit do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -571,7 +571,7 @@ var
 begin
   retour := 0;
   cases_battues := zero;
-  with posit do
+  with APosit do
     for The_position := 63 downto 0 do
       if cases[The_Position] > 0 then
       begin
@@ -620,7 +620,7 @@ begin
   Result := retour;
 end;
 
-function Cases_battues_par_noirs: integer;
+function Cases_battues_par_noirs(const APosit: T_echiquier): integer;
 var
   i, li, co, The_position, retour: integer;
 
@@ -643,7 +643,7 @@ var
     i, dep: integer;
   begin
     dep := The_position;
-    with posit do
+    with Aposit do
       for i := 1 to combien do
       begin
         Inc(dep, increment);
@@ -656,7 +656,7 @@ var
 begin
   retour := 0;
   cases_battues := zero;
-  with posit do
+  with Aposit do
     for The_position := 63 downto 0 do
       if cases[The_Position] < 0 then
       begin
@@ -997,9 +997,9 @@ procedure jouerfalse(const Le_depart, Larrivee, Lefface: integer; var APosit: T_
 var
   prise: shortint;
 begin
-  with posit do
+  with APosit do
   begin
-    prise := cases[Larrivee];
+    prise := Cases[Larrivee];
     if prise = pionnoir then
     begin
       Dec(pions_noirs[larrivee mod 8]);
@@ -1098,28 +1098,25 @@ begin
   end;
 end;
 
-procedure GenerateMoveList(const color: boolean; var APosit: T_Echiquier; var coups: T_Liste_Coup);
+procedure GenerateMoveList(const color: boolean; const APosit: T_Echiquier; out coups: T_Liste_Coup);
 var
   la_position: integer;
 begin
   coups.Nb_Pos := 0;
-  with APosit do
-    case color of
-      True:
-      begin
-        Cases_battues_par_blancs;
-        for La_Position := 63 downto 0 do
-          if Cases[La_Position] < 0 then
-            Moves_black(coups, La_Position, APosit);
-      end;
-      False:
-      begin
-        Cases_battues_par_noirs;
-        for La_Position := 0 to 63 do
-          if Cases[La_Position] > 0 then
-            Moves_white(coups, La_Position, APosit);
-      end;
-    end;
+  if color then
+  begin
+    Cases_battues_par_blancs(APosit);
+    for La_Position := 63 downto 0 do
+      if APosit.Cases[La_Position] < 0 then
+        Moves_black(La_Position, APosit, coups);
+  end
+  else
+  begin
+    Cases_battues_par_noirs(APosit);
+    for La_Position := 0 to 63 do
+      if APosit.Cases[La_Position] > 0 then
+        Moves_white(La_Position, APosit, coups);
+  end;
 end;
 
 end.

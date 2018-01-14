@@ -5,29 +5,23 @@ unit Fonctions;
 
 interface
 
-uses Graphics, Variables;
+uses Variables;
 
 function mouv(const de, ar: integer; const APosit: T_echiquier): T_str12;
-procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
 function cartesien(const ca: integer): T_str2;
 function enchiffre(const s: T_str2): integer;
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
-procedure Mark_Square(li, co: integer; c: Tcolor);
-procedure marque_possible;
 function strint(const a: int64): string;
 procedure Initialisation(out APosit: T_echiquier);
-procedure empile_Rep;
-procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
-procedure ecrire(la: integer; s: string);
+procedure empile_Rep(const APosit: T_echiquier);
 function EpdToEchiquier(s: string; var APosit: T_Echiquier): boolean;
 procedure recalcule(var APosit: T_echiquier);
 function temps(z: cardinal): string;
 
-
 implementation
 
 uses {$IFnDEF FPC} Windows,  {$ENDIF}
-  Forms, Dialogs, Classes, SysUtils, Echec1, Plateau;
+  Classes, SysUtils, Echec1, Plateau;
 
 function mouv(const de, ar: integer; const APosit: T_echiquier): T_str12;
 var
@@ -63,17 +57,6 @@ begin
       exit;
     end;
     Result := Quoi + cartesien(de) + lien + cartesien(ar);
-  end;
-end;
-
-procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
-begin
-  with Form1 do
-  begin
-    btnFirstMove.Enabled := btn1;
-    btnPrevMove.Enabled := btn2;
-    btnNextMove.Enabled := btn3;
-    btnLastMove.Enabled := btn4;
   end;
 end;
 
@@ -154,7 +137,7 @@ end;
 
 function suivant(const s: T_str100; var depart, arrivee: integer): boolean;
 var
-  i, ar, de: integer;
+  i, ar, de, combien_bib: integer;
   test: string;
 begin
   combien_bib := 0;
@@ -194,28 +177,6 @@ begin
   Result := False;
 end;
 
-procedure Mark_Square(li, co: integer; c: Tcolor);
-begin
-  with Form1.image1.canvas do
-  begin
-    tourne(li, co);
-    Pen.Color := c;
-    Pen.Width := 3;
-    Rectangle(co * largeur, li * largeur, (co + 1) * largeur, (li + 1) * largeur);
-    Pen.Color := clblack;
-    Pen.Width := 1;
-  end;
-end;
-
-procedure marque_possible;
-var
-  i: integer;
-begin
-  for i := 1 to Coups_Possibles.Nb_pos do
-    Mark_Square(Coups_Possibles.position[i, 2] div 8,
-      Coups_Possibles.position[i, 2] mod 8, ClRed);
-end;
-
 function strint(const a: int64): string;
 var
   s1, s: string;
@@ -253,8 +214,8 @@ begin
     Position_Roi[Blanc] := 60;
     Position_Roi[Noir] := 4;
     Total := 0;
-    Fillchar(pions_noirs, sizeOf(pions_noirs), 0);
-    Fillchar(pions_blancs, sizeOf(pions_blancs), 0);
+    Fillchar(pions_noirs, SizeOf(pions_noirs), 0);
+    Fillchar(pions_blancs, SizeOf(pions_blancs), 0);
     for i := 0 to 7 do
     begin
       pions_noirs[i] := 1;
@@ -264,59 +225,13 @@ begin
   recalcule(APosit);
 end;
 
-procedure empile_Rep;
+procedure empile_Rep(const APosit: T_echiquier);
 var
   i: integer;
 begin
   for i := Taille_Pile_Rep downto 2 do
     La_Pile_Rep[i] := La_Pile_Rep[i - 1];
-  La_Pile_Rep[1] := Posit;
-end;
-
-procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
-var
-  Norme, cX, cY: single;
-  Ax, Ay, Bx, By, li, co: integer;
-begin
-  li := deLa div 8;
-  co := deLa mod 8;
-  tourne(li, co);
-  Ax := Round((co + 0.5) * largeur);
-  Ay := Round((li + 0.5) * largeur);
-  li := alabas div 8;
-  co := alabas mod 8;
-  tourne(li, co);
-  Bx := Round((co + 0.5) * largeur);
-  By := Round((li + 0.5) * largeur);
-  Norme := SQRT((BX - AX) * (BX - AX) + (BY - AY) * (BY - AY));
-  if (Norme = 0) then
-    Exit;
-  cX := (BX - AX) / Norme;
-  cY := (BY - AY) / Norme;
-  with Form1.image1.canvas do
-  begin
-    Pen.Width := 3;
-    Pen.Color := couleur;
-    MoveTo(AX, AY);
-    LineTo(BX, BY);
-    MoveTo(BX, BY);
-    LineTo(Round(BX - cX * 30 + cY * 8), Round(BY - cY * 30 - cX * 8));
-    MoveTo(BX, BY);
-    LineTo(Round(BX - cX * 30 - cY * 8), Round(BY - cY * 30 + cX * 8));
-    pen.color := clblack;
-    Pen.Width := 1;
-  end;
-end;
-
-procedure ecrire(la: integer; s: string);
-var
-  li, co: integer;
-begin
-  li := La div 8;
-  co := La mod 8;
-  tourne(li, co);
-  with Form1.image1.canvas do
-    textout(round((co + 0.75) * largeur), round((li + 0.75) * largeur), s);
+  La_Pile_Rep[1] := APosit;
 end;
 
 procedure extraireMots(s: string; into: TStrings);    {  merci à Bloon  }
@@ -468,8 +383,8 @@ begin
     blanc_grand_roque := (Pos('Q', mot) > 0);
     noir_petit_roque := (Pos('k', mot) > 0);
     noir_grand_roque := (Pos('q', mot) > 0);
-    Fillchar(pions_noirs, sizeOf(pions_noirs), 0);
-    Fillchar(pions_blancs, sizeOf(pions_blancs), 0);
+    Fillchar(pions_noirs, SizeOf(pions_noirs), 0);
+    Fillchar(pions_blancs, SizeOf(pions_blancs), 0);
     for i := 0 to 63 do
       case Cases[i] of
         Roi: position_roi[blanc] := i;
@@ -509,8 +424,8 @@ var
 begin
   with APosit do
   begin
-    Fillchar(pions_noirs, sizeOf(pions_noirs), 0);
-    Fillchar(pions_blancs, sizeOf(pions_blancs), 0);
+    Fillchar(pions_noirs, SizeOf(pions_noirs), 0);
+    Fillchar(pions_blancs, SizeOf(pions_blancs), 0);
     total := 0;
     for i := 0 to 63 do
     begin
@@ -539,7 +454,7 @@ begin
   M := (Z div 60000) mod 60;
   H := (Z div 3600000);
   Z := (Z mod 1000) div 100;
-  temps := format('%.2dh%.2dmn%.2d.%.1d', [H, M, S, Z]) + 's';
+  Result := format('%.2dh%.2dmn%.2d.%.1d', [H, M, S, Z]) + 's';
 end;
 
 end.

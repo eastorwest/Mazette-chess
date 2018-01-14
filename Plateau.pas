@@ -5,15 +5,18 @@ unit Plateau;
 
 interface
 
-uses Variables;
+uses Graphics, Variables;
 
 procedure detourne(var li, co, la: integer);
 procedure tourne(var li, co: integer);
 procedure PaintBoard(const p: T_echiquier);
+procedure Mark_Square(li, co: integer; const c: TColor);
+procedure Mark_MoveList(const ACoups: T_Liste_Coup; const c: TColor);
+procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
 
 implementation
 
-uses Classes, Graphics, Echec1;
+uses Classes, Echec1;
 
 type
   profil = array[1..16] of array[1..2] of single;
@@ -76,7 +79,7 @@ var
 
   procedure ligne(const x1, y1, X2, Y2: single);
   begin
-    with Form1.image1.Canvas do
+    with Form1.Image1.Canvas do
     begin
       MoveTo(Round(X1), Round(Y1));
       LineTo(Round(X2), Round(Y2));
@@ -92,14 +95,15 @@ var
       polygone[i].x := lax + Round(qui[i, 1] * largeur);
       polygone[i].y := lay + Round(qui[i, 2] * largeur);
     end;
-    Form1.image1.Canvas.polygon(Slice(polygone, Combien));
+    Form1.Image1.Canvas.polygon(Slice(polygone, Combien));
   end;
 
 begin
   Form1.ClientWidth := 8 * largeur;
   Form1.ClientHeight := 8 * largeur + Form1.Panel1.Height;
   Form1.Image1.Height := 10 * largeur; //strange 10, but works
-  with Form1.image1.Canvas do
+  Form1.Image1.Width := 10 * largeur;
+  with Form1.Image1.Canvas do
     for la := 0 to 63 do
     begin
       li := La div 8;
@@ -120,13 +124,13 @@ begin
       choix := p.Cases[la];
       if choix < 0 then
       begin
-        brush.color := clBlack;
-        pen.color := clWhite;
+        Brush.color := clBlack;
+        Pen.color := clWhite;
       end
       else
       begin
-        brush.color := clWhite;
-        pen.color := clBlack;
+        Brush.color := clWhite;
+        Pen.color := clBlack;
       end;
       case choix of
         PionNoir, Pion: Trace_Profil(oux, ouy, lep, 12);
@@ -144,17 +148,17 @@ begin
         begin
           Trace_Profil(oux, ouy, ler, 13);
           if choix < 0 then
-            form1.image1.Canvas.Pen.Color := clWhite
+            Form1.image1.Canvas.Pen.Color := clWhite
           else
-            form1.image1.Canvas.Pen.Color := clBlack;
+            Form1.image1.Canvas.Pen.Color := clBlack;
           Pen.Width := 5;
           ligne(oux, ouy - 0.1 * largeur, oux, ouy - 0.3 * largeur);
           ligne(oux - 0.1 * largeur, ouy - 0.2 * largeur, oux +
             0.1 * largeur, ouy - 0.2 * largeur);
           if choix > 0 then
-            form1.image1.Canvas.Pen.Color := clWhite
+            Form1.image1.Canvas.Pen.Color := clWhite
           else
-            form1.image1.Canvas.Pen.Color := clBlack;
+            Form1.image1.Canvas.Pen.Color := clBlack;
           Pen.Width := 3;
           ligne(oux, ouy - 0.1 * largeur, oux, ouy - 0.3 * largeur);
           ligne(oux - 0.1 * largeur, ouy - 0.2 * largeur, oux +
@@ -163,9 +167,65 @@ begin
         end;
       end;
       Brush.style := bsClear;
-      pen.color := clGreen;
-      pen.color := clBlack;
+      Pen.color := clGreen;
+      Pen.color := clBlack;
     end;
+end;
+
+procedure Mark_Square(li, co: integer; const c: TColor);
+begin
+  with Form1.image1.canvas do
+  begin
+    tourne(li, co);
+    Pen.Color := c;
+    Pen.Width := 3;
+    Rectangle(co * largeur, li * largeur, (co + 1) * largeur, (li + 1) * largeur);
+    Pen.Color := clBlack;
+    Pen.Width := 1;
+  end;
+end;
+
+procedure Mark_MoveList(const ACoups: T_Liste_Coup; const c: TColor);
+var
+  i: integer;
+begin
+  for i := 1 to ACoups.Nb_pos do
+    Mark_Square(ACoups.position[i, 2] div 8, ACoups.position[i, 2] mod 8, c);
+end;
+
+procedure PaintArrow(const dela, alabas: integer; const couleur: TColor);
+var
+  Norme, cX, cY: single;
+  Ax, Ay, Bx, By, li, co: integer;
+begin
+  li := dela div 8;
+  co := dela mod 8;
+  tourne(li, co);
+  Ax := Round((co + 0.5) * largeur);
+  Ay := Round((li + 0.5) * largeur);
+  li := alabas div 8;
+  co := alabas mod 8;
+  tourne(li, co);
+  Bx := Round((co + 0.5) * largeur);
+  By := Round((li + 0.5) * largeur);
+  Norme := SQRT((BX - AX) * (BX - AX) + (BY - AY) * (BY - AY));
+  if Norme = 0 then
+    exit;
+  cX := (BX - AX) / Norme;
+  cY := (BY - AY) / Norme;
+  with Form1.image1.canvas do
+  begin
+    Pen.Width := 3;
+    Pen.Color := couleur;
+    MoveTo(AX, AY);
+    LineTo(BX, BY);
+    MoveTo(BX, BY);
+    LineTo(Round(BX - cX * 30 + cY * 8), Round(BY - cY * 30 - cX * 8));
+    MoveTo(BX, BY);
+    LineTo(Round(BX - cX * 30 - cY * 8), Round(BY - cY * 30 + cX * 8));
+    Pen.Width := 1;
+    Pen.Color := clBlack;
+  end;
 end;
 
 end.

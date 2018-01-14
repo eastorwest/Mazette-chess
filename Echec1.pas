@@ -109,6 +109,8 @@ type
     { public declarations }
   end;
 
+  procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
+
 var
   Form1: TForm1;
 
@@ -118,6 +120,9 @@ implementation
 
 uses
   Variables, Plateau, Deplacements, Fonctions, AB, Promotion, Recherchedecoups, EPD;
+
+var
+  ASquare: integer; // first square of the human move
 
 function Min(const a,b: integer): integer;
 begin
@@ -153,21 +158,21 @@ begin
   PaintBoard(posit_dessin);
 end;
 
-function danslaliste(const ca: integer; var ef: integer): boolean;
+function InMoveList(const ca: integer; const AMoveList: T_Liste_Coup; var ef: integer): boolean;
 var
   i: integer;
 begin
   Result := False;
-  for i := 1 to Coups_Possibles.Nb_pos do
-    if ca = Coups_Possibles.position[i, 2] then
+  for i := 1 to AMoveList.Nb_pos do
+    if ca = AMoveList.position[i, 2] then
     begin
+      ef := AMoveList.position[i, 3];
       Result := True;
-      ef := Coups_Possibles.position[i, 3];
       exit;
     end;
 end;
 
-procedure inc_historique(const la, labas, la_ef: integer);
+procedure inc_historique(const la, labas, la_ef: integer; const APosit: T_echiquier);
 begin
   Combien_hist := Index_hist;
   Inc(Combien_hist);
@@ -177,16 +182,15 @@ begin
     depart := la;
     arrivee := labas;
     efface := la_ef;
-    QuoiDedans := Posit.Cases[labas];
+    QuoiDedans := APosit.Cases[labas];
   end;
 end;
 
 procedure Computer;
 var
   i: integer;
-  possibles: T_Liste_Coup;
-  b, trouve: boolean;
-  mouv_str: T_str12;
+  b: boolean;
+  historique, sMove: string;
 begin
   //Form1.miStop.Visible := True;
   //Form1.miFile.Enabled := False;
@@ -213,7 +217,7 @@ begin
     8..30: profope := Init_Prof + 1;
     31..100: Profope := Init_Prof;
   end;
-  Form1.label4.Caption := Format('Analyse: %d plies',[profope]);
+  Form1.Label4.Caption := Format('Analyse: %d plies',[profope]);
   h := {$IFnDEF FPC} GetTickCount {$ELSE} GetTickCount64 {$ENDIF};
   Nb_Eval := 0;
   b := suivant(historique, best_depart, best_arrivee);
@@ -227,37 +231,32 @@ begin
     else
     begin
       if Couleur_Ordi then
-        Moves_black(Coups_Possibles, best_depart, Posit)
+        Moves_black(best_depart, Posit, Coups_Possibles)
       else
-        Moves_white(Coups_Possibles, best_depart, Posit);
-      trouve := False;
-      for i := 1 to Coups_Possibles.Nb_pos do
-        if Coups_Possibles.position[i, 2] = best_arrivee then
-          trouve := True;
-      b := trouve;
+        Moves_white(best_depart, Posit, Coups_Possibles);
+      b := InMoveList(best_arrivee, Coups_Possibles, i);
     end;
   end;
   if not b then
-    Recherche(Couleur_Ordi);
+    SearchBestMove(Couleur_Ordi, Posit);
   if IsPlayOn then
   begin
-    mouv_str := mouv(best_depart, best_arrivee, Posit);
+    sMove := mouv(best_depart, best_arrivee, Posit);
     PlayMove(best_depart, best_arrivee, best_efface, Posit);
-    Empile_Rep;
-    inc_historique(best_depart, best_arrivee, best_efface);
+    Empile_Rep(Posit);
+    inc_historique(best_depart, best_arrivee, best_efface, Posit);
     posit_dessin := Posit;
     PaintBoard(posit_dessin);
     Mark_Square(best_arrivee div 8, best_arrivee mod 8, clBlue);
     Mark_Square(best_depart div 8, best_depart mod 8, clBlue);
-    Form1.Label4.Caption := mouv_str;
+    Form1.Label4.Caption := sMove;
   end;
   if (Couleur_ordi and souslefeu(Posit.position_roi[False], 1, False, Posit)) or
     (not Couleur_ordi and souslefeu(Posit.position_roi[True], -1, False, Posit)) then
   begin
-    Form1.label1.Caption := 'Echec';
+    Form1.Label1.Caption := 'Echec';
     GenerateMoveList(not Couleur_ordi, Posit, Coups_Possibles);
-    possibles := Coups_Possibles;
-    if possibles.Nb_pos = 0 then
+    if Coups_Possibles.Nb_pos = 0 then
       ShowMessage('CheckMate');
   end;
   PanelEnabler(True, True, False, False);
@@ -285,50 +284,50 @@ begin
       ShowMessage('It is not your turn to play move !');
       exit;
     end;
-    if not Coups_en_cours then
+    if not IsMoveInput then
     begin
-      la := x div largeur + 8 * (y div largeur);
-      detourne(li, co, la);
-      if ((Posit.Cases[la] <= 0) and Couleur_Ordi) or
-        ((Posit.Cases[la] >= 0) and not Couleur_Ordi) then
+      ASquare := x div largeur + 8 * (y div largeur);
+      detourne(li, co, ASquare);
+      if ((Posit.Cases[ASquare] <= 0) and Couleur_Ordi) or
+        ((Posit.Cases[ASquare] >= 0) and not Couleur_Ordi) then
         exit;
       Coups_Possibles.Nb_pos := 0;
       if Couleur_Ordi then
       begin
-        Cases_battues_par_noirs;
-        Moves_white(Coups_Possibles, la, Posit);
+        Cases_battues_par_noirs(Posit);
+        Moves_white(ASquare, Posit, Coups_Possibles);
       end
       else
       begin
-        Cases_battues_par_blancs;
-        Moves_black(Coups_Possibles, la, Posit);
+        Cases_battues_par_blancs(Posit);
+        Moves_black(ASquare, Posit, Coups_Possibles);
       end;
-      marque_possible;
+      Mark_MoveList(Coups_Possibles, clRed);
       if Coups_Possibles.Nb_pos <> 0 then
-        Coups_en_cours := True;
+        IsMoveInput := True;
     end
     else
     begin
       PanelEnabler(False, False, False, False);
-      Coups_en_cours := False;
+      IsMoveInput := False;
       labas := x div largeur + 8 * (y div largeur);
       detourne(li, co, labas);
-      if danslaliste(labas, la_ef) then
+      if InMoveList(labas, Coups_Possibles, la_ef) then
       begin
         if Couleur_Ordi then
-          promo := ((labas <= 7) and (Posit.Cases[la] = pion))
+          promo := ((labas <= 7) and (Posit.Cases[ASquare] = pion))
         else
-          promo := ((labas >= 56) and (Posit.Cases[la] = pionNoir));
-        PlayMove(la, labas, la_ef, Posit);
+          promo := ((labas >= 56) and (Posit.Cases[ASquare] = pionNoir));
+        PlayMove(ASquare, labas, la_ef, Posit);
         if promo then {promotion pawn}
         begin
           Posit.Cases[labas] := (1 - 2*ord(not Couleur_Ordi))*Form2.ShowModal;
           recalcule(Posit);
         end;
-        inc_historique(la, labas, la_ef);
-        Empile_Rep;
+        inc_historique(ASquare, labas, la_ef, Posit);
+        Empile_Rep(Posit);
         PaintBoard(Posit);
-        Mark_Square(la div 8, la mod 8, ClRed);
+        Mark_Square(ASquare div 8, ASquare mod 8, ClRed);
         Mark_Square(labas div 8, labas mod 8, ClRed);
         Computer;
       end
@@ -368,11 +367,12 @@ var
   i: Integer;
   AMoveSList: TStringList;
   ATempPosit: T_Echiquier;
+  AFileName: string;
 begin
   if SaveDialog2.Execute then
   begin
-    nomdefichier := SaveDialog2.Filename;
-    if FileExists(nomdefichier) then
+    AFileName := SaveDialog2.Filename;
+    if FileExists(AFileName) then
       if MessageDlg('File already exists. Do you wish to replace it ?',
         mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
         exit;
@@ -388,7 +388,7 @@ begin
       ATempPosit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
     end;
 
-    AssignFile(F, nomdefichier);
+    AssignFile(F, AFileName);
     ReWrite(F);
     try
       for i := 0 to AMoveSList.Count-1 do
@@ -462,8 +462,8 @@ begin
   end;
   PlayMove(la, labas, la, Posit);
   posit_dessin := Posit;
-  PaintBoard(Posit);
-  inc_historique(la, labas, la);
+  PaintBoard(posit_dessin);
+  inc_historique(la, labas, la, Posit);
   IsPlayOn := True;
 end;
 
@@ -490,7 +490,7 @@ end;
 
 procedure TForm1.miAboutClick(Sender: TObject);
 begin
-  AboutBox.showmodal;
+  AboutBox.ShowModal;
 end;
 
 procedure TForm1.miPly7Click(Sender: TObject);
@@ -544,15 +544,16 @@ end;
 procedure TForm1.miSaveGameClick(Sender: TObject);
 var
   F: file;
+  AFileName: string;
 begin
   if SaveDialog1.Execute then
   begin
-    nomdefichier := SaveDialog1.Filename;
-    if FileExists(nomdefichier) then
+    AFileName := SaveDialog1.Filename;
+    if FileExists(AFileName) then
       if MessageDlg('File already exists. Do you wish to replace it ?',
         mtConfirmation, [mbYes, mbNo], 0) <> mrYes then
         exit;
-    AssignFile(F, nomdefichier);
+    AssignFile(F, AFileName);
     ReWrite(F, 1);
     try
       BlockWrite(F, Couleur_Ordi, SizeOf(Couleur_Ordi));
@@ -571,7 +572,7 @@ var
 begin
   for i := 1 to jusque do
   begin
-    empile_Rep;
+    empile_Rep(Posit);
     PlayMove(hist_int[i].depart, hist_int[i].arrivee, hist_int[i].efface, Posit);
     Posit.Cases[hist_int[i].arrivee] := hist_int[i].QuoiDedans;
   end;
@@ -582,14 +583,15 @@ end;
 procedure TForm1.miOpenGameClick(Sender: TObject);
 var
   F: file;
+  AFileName: string;
 begin
   if OpenDialog2.Execute then
   begin
-    nomdefichier := OpenDialog2.Filename;
+    AFileName := OpenDialog2.Filename;
     Index_hist := 0;
     Initialisation(Posit);
     IsPlayOn := True;
-    AssignFile(F, nomdefichier);
+    AssignFile(F, AFileName);
     Reset(F, 1);
     try
       BlockRead(F, Couleur_Ordi, SizeOf(Couleur_Ordi));
@@ -642,7 +644,7 @@ procedure TForm1.btnPrevMoveClick(Sender: TObject);
 begin
   if Index_hist < 1 then
     exit;
-  Coups_en_cours := False;
+  IsMoveInput := False;
   Posit := InitPos;
   Dec(Index_hist, 1);
   PanelEnabler(Index_hist > 0, Index_hist > 0, True, True);
@@ -653,7 +655,7 @@ procedure TForm1.btnNextMoveClick(Sender: TObject);
 begin
   if Index_hist > Combien_hist - 1 then
     exit;
-  Coups_en_cours := False;
+  IsMoveInput := False;
   Posit := InitPos;
   Inc(Index_hist, 1);
   PanelEnabler(True, True, (Index_hist < Combien_hist), (Index_hist < Combien_hist));
@@ -664,7 +666,7 @@ procedure TForm1.btnFirstMoveClick(Sender: TObject);
 begin
   if Index_hist < 1 then
     exit;
-  Coups_en_cours := False;
+  IsMoveInput := False;
   Posit := InitPos;
   Index_hist := 0;
   PanelEnabler(Index_hist > 0, Index_hist > 0, True, True);
@@ -675,7 +677,7 @@ procedure TForm1.btnLastMoveClick(Sender: TObject);
 begin
   if Index_hist > Combien_hist - 1 then
     exit;
-  Coups_en_cours := False;
+  IsMoveInput := False;
   Posit := InitPos;
   Index_hist := Combien_hist;
   PanelEnabler(True, True, (Index_hist < Combien_hist), (Index_hist < Combien_hist));
@@ -718,7 +720,7 @@ procedure trace_battues(const Acolor: boolean);
 var
   la, li, co, oux, ouy, total: integer;
 
-  procedure lignes(const x1, y1, X2, Y2: single);
+  procedure lignes(const X1, Y1, X2, Y2: single);
   begin
     with Form1.image1.canvas do
     begin
@@ -730,9 +732,9 @@ var
 begin
   total := 0;
   if Acolor then
-    Cases_battues_par_noirs
+    Cases_battues_par_noirs(Posit)
   else
-    Cases_battues_par_blancs;
+    Cases_battues_par_blancs(Posit);
   with Form1.image1.canvas do
     for la := 0 to 63 do
     begin
@@ -766,6 +768,17 @@ end;
 procedure TForm1.Casesbattuesnoirs1Click(Sender: TObject);
 begin
   trace_battues(True);
+end;
+
+procedure PanelEnabler(const btn1, btn2, btn3, btn4: boolean);
+begin
+  with Form1 do
+  begin
+    btnFirstMove.Enabled := btn1;
+    btnPrevMove.Enabled := btn2;
+    btnNextMove.Enabled := btn3;
+    btnLastMove.Enabled := btn4;
+  end;
 end;
 
 end.

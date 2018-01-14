@@ -5,18 +5,18 @@ unit Evaluation;
 
 interface
 
-function evaluer(const cote: boolean): integer;
+uses Variables;
+
+function evaluer(const cote: boolean; const APosit: T_echiquier): integer;
 
 implementation
 
-uses SysUtils, Variables;
-
-function evaluer(const cote: boolean): integer;
+function evaluer(const cote: boolean; const APosit: T_echiquier): integer;
 var
   retour: integer;
 begin
   Inc(Nb_Eval);
-  with posit do
+  with APosit do
   begin
     retour := 0;
     if complexite >= 25 then
